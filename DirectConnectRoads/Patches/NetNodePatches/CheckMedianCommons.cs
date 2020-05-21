@@ -18,12 +18,16 @@ namespace DirectConnectRoads.Patches {
             int targetSegmentIDX = data.m_dataInt0 >> 4;
             ushort targetSegmentID = nodeId.ToNode().GetSegment(targetSegmentIDX);
             NetInfo.Node nodeInfo = sourceSegmentID.ToSegment().Info.m_nodes[nodeInfoIDX];
-            if (!DirectConnectUtil.IsMedian(nodeInfo, nodeId.ToNode().Info))
+            if (!DirectConnectUtil.IsMedian(nodeInfo, nodeId.ToNode().Info)) {
+                Log._Debug($"not a median: node:{nodeId} connect_group:{nodeInfo.m_connectGroup} vehcileTypes:{nodeId.ToNode().Info.m_vehicleTypes}");
                 return true; // ignore.
+            }
+
+            return !DirectConnectUtil.IsMedianBroken(sourceSegmentID, targetSegmentID);
 
             if (TMPE_Exists_) {
                 try {
-                    return !DirectConnectUtil.IsMedianBroken(sourceSegmentID,targetSegmentID);
+                    return !DirectConnectUtil.IsMedianBroken(sourceSegmentID, targetSegmentID);
                 }
                 catch {
                     TMPE_Exists_ = false;
@@ -83,7 +87,6 @@ namespace DirectConnectRoads.Patches {
             var code = codes[index + 1];
             Extensions.Assert(IsLdLoc(code), $"IsLdLoc(code) | code={code}");
             return code;
-
         }
 
 

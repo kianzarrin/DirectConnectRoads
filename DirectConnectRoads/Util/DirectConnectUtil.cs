@@ -12,7 +12,7 @@ namespace DirectConnectRoads.Util {
         #region Median Texture Detection
         public static bool IsMedian(this NetInfo.Node nodeInfo, NetInfo netInfo) {
             var nodeInfoVehicleTypes = GetVehicleType(nodeInfo.m_connectGroup);
-            return (netInfo.m_vehicleTypes | nodeInfoVehicleTypes) != VehicleInfo.VehicleType.None;
+            return (netInfo.m_vehicleTypes & nodeInfoVehicleTypes) == VehicleInfo.VehicleType.None;
         }
 
         //public const VehicleInfo.VehicleType TRACK_VEHICLE_TYPES =
@@ -80,10 +80,14 @@ namespace DirectConnectRoads.Util {
             GetGeometry(segmentID1, segmentID2, out var leftSegments, out var rightSegments);
             foreach (ushort segmentID in rightSegments) {
                 var targetSegments = GetTargetSegments(segmentID, nodeID);
-                if(targetSegments.Intersect(leftSegments).Count()>0)
+                if (targetSegments.Intersect(leftSegments).Count() > 0) {
+                    Log._Debug($"intersection detected segment:{segmentID} targetSegments:{targetSegments.ToSTR()} leftSegments:{leftSegments.ToSTR()}");
                     return true;
-                if (targetSegments.Contains(segmentID1))
+                }
+                if (targetSegments.Contains(segmentID1)) {
+                    Log._Debug($"far left turn detected segment:{segmentID} targetSegments:{targetSegments.ToSTR()} segmentID1:{segmentID1}");
                     return true;
+                }
             }
             return false;
         }
@@ -188,13 +192,17 @@ namespace DirectConnectRoads.Util {
                 else
                     leftSegments.Add(segmentID);
             }
+            Log._Debug($"GetGeometry({segmentID1} ,{segmentID2}) -> " +
+                    $"leftSegments={leftSegments.ToSTR()} , rightSegments={rightSegments.ToSTR()}");
         }
 
         public static float GetSegmentsAngle(ushort from, ushort to) {
             ushort nodeID = from.ToSegment().GetSharedNode(to);
             var dir1 = from.ToSegment().GetDirection(nodeID);
             var dir2 = to.ToSegment().GetDirection(nodeID);
-            return VectorUtil.SignedAngleRadCCW(dir1, dir2);
+            var ret = VectorUtil.SignedAngleRadCCW(dir1, dir2);
+            Log._Debug($"GetSegmentsAngle({from} , {to}) => {ret}");
+            return ret;
         }
         #endregion
     }

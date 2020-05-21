@@ -51,7 +51,7 @@ namespace DirectConnectRoads.Math {
         public static float SignedAngleRadCCW(Vector2 v1, Vector2 v2) {
             float dot = Vector2.Dot(v1, v2);
             float det = Determinent(v1, v2);
-            float angle = Mathf.Atan2(det, dot);
+            float angle = Mathf.Atan2(dot, det);
             return angle;
         }
 

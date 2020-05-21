@@ -5,6 +5,7 @@ using System.Reflection;
 using System;
 using System.Linq;
 using GenericGameBridge.Service;
+using System.Collections.Generic;
 
 namespace DirectConnectRoads.Util {
 
@@ -69,6 +70,25 @@ namespace DirectConnectRoads.Util {
         }
 
         public static INetService netService => TrafficManager.Constants.ServiceFactory.NetService;
+
+        /// <summary>
+        /// Creates and string of all items with enumerable inpute as {item1, item2, item3}
+        /// null argument returns "Null"
+        /// </summary>
+        internal static string ToSTR<T>(this IEnumerable<T> enumerable) {
+            if (enumerable == null)
+                return "Null";
+            string ret = "{ ";
+            foreach (T item in enumerable) {
+                ret += $"{item}, ";
+            }
+            ret.Remove(ret.Length - 2, 2);
+            ret += " }";
+            return ret;
+        }
+
+        internal static string ToSTR(this List<LanePos> laneList) =>
+            (from lanePos in laneList select lanePos.laneId).ToSTR();
 
     }
 }
