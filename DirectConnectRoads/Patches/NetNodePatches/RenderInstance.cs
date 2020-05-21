@@ -5,7 +5,7 @@ using System.Reflection.Emit;
 using System.Collections.Generic;
 
 namespace DirectConnectRoads.Patches.NetNodePatches {
-    using Utils;
+    using Util;
 
     [HarmonyPatch()]
     public static class RenderInstance {

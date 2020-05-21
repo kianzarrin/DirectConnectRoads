@@ -5,7 +5,7 @@ using HarmonyLib;
 
 namespace DirectConnectRoads.Patches {
     using System.Reflection;
-    using Utils;
+    using Util;
     public static class TranspilerUtils {
         static void Log(object message) {
             Extensions.Log("TRANSPILER " + message);

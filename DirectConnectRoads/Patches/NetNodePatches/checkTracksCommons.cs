@@ -5,7 +5,7 @@ using System.Reflection.Emit;
 using ColossalFramework;
 
 namespace DirectConnectRoads.Patches {
-    using Utils;
+    using Util;
     using static TranspilerUtils;
     public static class CheckTracksCommons {
         public static bool ShouldConnectTracks(

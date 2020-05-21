@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using GenericGameBridge.Service;
 
-namespace DirectConnectRoads.Utils {
+namespace DirectConnectRoads.Util {
 
     public static class Extensions {
         public static T Max<T>()
@@ -23,10 +23,6 @@ namespace DirectConnectRoads.Utils {
                 b.ClearBit(idx);
         }
 
-        internal static ref NetNode ToNode(this ushort id) => ref Singleton<NetManager>.instance.m_nodes.m_buffer[id];
-        internal static ref NetSegment ToSegment(this ushort id) => ref Singleton<NetManager>.instance.m_segments.m_buffer[id];
-        internal static NetLane ToLane(this uint id) => Singleton<NetManager>.instance.m_lanes.m_buffer[id];
-
         internal static AppMode currentMode => SimulationManager.instance.m_ManagersWrapper.loading.currentMode;
         internal static bool CheckGameMode(AppMode mode) => CheckGameMode(new[] { mode });
         internal static bool CheckGameMode(AppMode[] modes) {
@@ -42,7 +38,7 @@ namespace DirectConnectRoads.Utils {
         internal static bool InAssetEditor => CheckGameMode(AppMode.AssetEditor);
 
         internal static void Log(string m, bool u=false) {
-            Utils.Log.Info(m);
+            Util.Log.Info(m);
             if (u) UnityEngine.Debug.Log(m);
         }
         

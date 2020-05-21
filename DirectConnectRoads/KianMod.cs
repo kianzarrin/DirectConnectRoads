@@ -1,7 +1,7 @@
 using HarmonyLib;
 using ICities;
 using JetBrains.Annotations;
-using DirectConnectRoads.Utils;
+using DirectConnectRoads.Util;
 using CitiesHarmony.API;
 using System.Runtime.CompilerServices;
 
