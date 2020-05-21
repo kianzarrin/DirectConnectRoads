@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{17034566-78DF-4C3D-BD3F-3B833CB2D872}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DirectConnectRoads</RootNamespace>
+    <AssemblyName>DirectConnectRoads</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>false</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony, Version=2.0.0.9, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.0.0.9\lib\net35\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CitiesHarmony.API, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CitiesHarmony.API.1.0.4\lib\net35\CitiesHarmony.API.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Assembly-CSharp">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ColossalManaged">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ICities">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TMPE.CitiesGameBridge">
+      <HintPath>..\libs\TMPE.CitiesGameBridge.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TMPE.GenericGameBridge">
+      <HintPath>..\libs\TMPE.GenericGameBridge.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="CSUtil.Commons">
+      <HintPath>..\libs\CSUtil.Commons.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TrafficManager">
+      <HintPath>..\libs\TrafficManager.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NetworkSkins">
+      <HintPath>..\libs\NetworkSkins.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="KianMod.cs" />
+    <Compile Include="Patches\NetNodePatches\checkTracksCommons.cs" />
+    <Compile Include="Patches\NetNodePatches\RenderInstance.cs" />
+    <Compile Include="Patches\TranspilerUtils.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\DirectConnectUtil.cs" />
+    <Compile Include="Utils\Extensions.cs" />
+    <Compile Include="Utils\Log.cs" />
+    <Compile Include="Utils\TMPEUtils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>set "DEPLOYDIR=$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(TargetName)\"
+
+if not exist "%25DEPLOYDIR%25" mkdir "%25DEPLOYDIR%25"
+
+xcopy "$(TargetDir)CitiesHarmony.API.dll" "%25DEPLOYDIR%25" /y /e
+
+del "%25DEPLOYDIR%25$(TargetFileName)"
+xcopy "$(TargetPath)" "%25DEPLOYDIR%25"  /y /e
+
+echo %25time%25
+set "DEPLOYDIR="</PostBuildEvent>
+  </PropertyGroup>
+</Project>
