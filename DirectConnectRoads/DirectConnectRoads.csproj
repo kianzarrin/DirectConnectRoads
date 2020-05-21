@@ -87,13 +87,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KianMod.cs" />
-    <Compile Include="Math\BezierUtil.cs" />
-    <Compile Include="Math\CubicBezier3.cs" />
-    <Compile Include="Math\LineUtil.cs" />
     <Compile Include="Math\MathUtil.cs" />
-    <Compile Include="Math\PointDir3.cs" />
     <Compile Include="Math\VecetorUtils.cs" />
-    <Compile Include="Patches\NetNodePatches\checkTracksCommons.cs" />
+    <Compile Include="Patches\NetNodePatches\CheckMedianCommons.cs" />
     <Compile Include="Patches\NetNodePatches\RenderInstance.cs" />
     <Compile Include="Patches\TranspilerUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

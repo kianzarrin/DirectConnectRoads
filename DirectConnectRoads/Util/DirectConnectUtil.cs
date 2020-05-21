@@ -10,10 +10,9 @@ namespace DirectConnectRoads.Util {
 
     public static class DirectConnectUtil {
         #region Median Texture Detection
-        public static bool IsMedian(this NetInfo.Node nodeInfo, ushort segmentID) {
-            var segmentVehicleTypes = segmentID.ToSegment().Info.m_vehicleTypes;
+        public static bool IsMedian(this NetInfo.Node nodeInfo, NetInfo netInfo) {
             var nodeInfoVehicleTypes = GetVehicleType(nodeInfo.m_connectGroup);
-            return (segmentVehicleTypes | nodeInfoVehicleTypes) != VehicleInfo.VehicleType.None;
+            return (netInfo.m_vehicleTypes | nodeInfoVehicleTypes) != VehicleInfo.VehicleType.None;
         }
 
         //public const VehicleInfo.VehicleType TRACK_VEHICLE_TYPES =
@@ -100,7 +99,7 @@ namespace DirectConnectRoads.Util {
         /// <returns></returns>
         public static IEnumerable<ushort> GetTargetSegments(ushort sourceSegmentID, ushort nodeID) {
             foreach (ushort targetSegmentID in NetUtil.GetSegmentsCoroutine(nodeID)) {
-                if (SegmentGoToSegment(sourceSegmentID, targetSegmentID){
+                if (SegmentGoToSegment(sourceSegmentID, targetSegmentID)){
                     yield return targetSegmentID;
                 }
             }

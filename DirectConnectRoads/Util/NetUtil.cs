@@ -1,12 +1,10 @@
 using ColossalFramework;
 using ColossalFramework.Math;
+using DirectConnectRoads.Math;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using UnityEngine;
-using AutomaticNodePainter.Math;
 
 namespace DirectConnectRoads.Util {
     public class NetServiceException : Exception {
@@ -153,27 +151,6 @@ namespace DirectConnectRoads.Util {
             return bezier;
         }
 
-        /// <param name="startNode"> if true the bezier is inverted so that it will be facing start node</param>
-        /// Note: inverted flag or LHT does not influce the beizer.
-        internal static Bezier2 CalculateSegmentBezier2(ushort segmentId, bool startNode) {
-            Bezier3 bezier3 = segmentId.ToSegment().CalculateSegmentBezier3();
-            Bezier2 bezier2 = bezier3.ToCSBezier2();
-            if (!startNode)
-                return bezier2;
-            else
-                return bezier2.Invert();
-        }
-
-        /// <param name="endNodeID">bezier will be facing endNodeID</param>
-        internal static Bezier2 CalculateSegmentBezier2(ushort segmentId, ushort endNodeID) {
-            bool startNode = !IsStartNode(segmentId, endNodeID);
-            return CalculateSegmentBezier2(segmentId, startNode);
-        }
-
-        internal static float GetClosestT(this ref NetSegment segment, Vector3 position) {
-            Bezier3 bezier = segment.CalculateSegmentBezier3();
-            return bezier.GetClosestT(position);
-        }
 
         #region copied from TMPE
         public static bool LHT => TrafficDrivesOnLeft;
@@ -200,21 +177,21 @@ namespace DirectConnectRoads.Util {
         public static ushort GetSharedNode(ushort segmentID1, ushort segmentID2) =>
             segmentID1.ToSegment().GetSharedNode(segmentID2);
 
-        public static bool IsSegmentValid(ushort segmentId) {
-            if (segmentId != 0) {
-                return segmentId.ToSegment().m_flags.
-                    CheckFlags(required: NetSegment.Flags.Created, forbidden: NetSegment.Flags.Deleted);
-            }
-            return false;
-        }
+        //public static bool IsSegmentValid(ushort segmentId) {
+        //    if (segmentId != 0) {
+        //        return segmentId.ToSegment().m_flags.
+        //            CheckFlags(required: NetSegment.Flags.Created, forbidden: NetSegment.Flags.Deleted);
+        //    }
+        //    return false;
+        //}
 
-        public static bool IsNodeValid(ushort nodeId) {
-            if (nodeId != 0) {
-                return nodeId.ToNode().m_flags.
-                    CheckFlags(required: NetNode.Flags.Created, forbidden: NetNode.Flags.Deleted);
-            }
-            return false;
-        }
+        //public static bool IsNodeValid(ushort nodeId) {
+        //    if (nodeId != 0) {
+        //        return nodeId.ToNode().m_flags.
+        //            CheckFlags(required: NetNode.Flags.Created, forbidden: NetNode.Flags.Deleted);
+        //    }
+        //    return false;
+        //}
 
         public static ushort GetHeadNode(ref NetSegment segment) {
             // tail node>-------->head node
@@ -287,7 +264,7 @@ namespace DirectConnectRoads.Util {
         /// </summary>
         public static IEnumerable<ushort> GetCCSegList(ushort nodeID) {
             ushort segmentID0 = GetFirstSegment(nodeID);
-            HelpersExtensions.Assert(segmentID0 != 0, "GetFirstSegment!=0");
+            Extensions.Assert(segmentID0 != 0, "GetFirstSegment!=0");
             yield return segmentID0;
             ushort segmentID = segmentID0;
 
@@ -306,7 +283,7 @@ namespace DirectConnectRoads.Util {
         /// </summary>
         public static IEnumerable<ushort> GetCWSegList(ushort nodeID) {
             ushort segmentID0 = GetFirstSegment(nodeID);
-            HelpersExtensions.Assert(segmentID0 != 0, "GetFirstSegment!=0");
+            Extensions.Assert(segmentID0 != 0, "GetFirstSegment!=0");
             yield return segmentID0;
             ushort segmentID = segmentID0;
 

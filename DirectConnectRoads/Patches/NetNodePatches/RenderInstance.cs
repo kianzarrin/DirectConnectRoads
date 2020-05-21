@@ -24,7 +24,7 @@ namespace DirectConnectRoads.Patches.NetNodePatches {
         public static IEnumerable<CodeInstruction> Transpiler(ILGenerator il, IEnumerable<CodeInstruction> instructions) {
             try {
                 var codes = TranspilerUtils.ToCodeList(instructions);
-                CheckTracksCommons.ApplyCheckTracks(codes, Target, occurance:1);
+                CheckMedianCommons.ApplyCheckMedian(codes, Target, occurance:1);
 
                 Log("successfully patched NetNode.RenderInstance");
                 return codes;

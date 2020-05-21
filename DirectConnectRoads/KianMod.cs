@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using DirectConnectRoads.Util;
 using CitiesHarmony.API;
 using System.Runtime.CompilerServices;
+using DirectConnectRoads.Patches;
 
 namespace DirectConnectRoads {
     public class KianModInfo : IUserMod {
@@ -15,13 +16,13 @@ namespace DirectConnectRoads {
         public void OnEnabled() {
             System.IO.File.WriteAllText("mod.debug.log", ""); // restart log.
             HarmonyHelper.DoOnHarmonyReady(InstallHarmony); 
-            LoadingManager.instance.m_levelPreLoaded += TMPEUTILS.Init;
-            TMPEUTILS.Init();
+            LoadingManager.instance.m_levelPreLoaded += CheckMedianCommons.Init;
+            CheckMedianCommons.Init();
         }
 
         [UsedImplicitly]
         public void OnDisabled() {
-            LoadingManager.instance.m_levelPreLoaded -= TMPEUTILS.Init;
+            LoadingManager.instance.m_levelPreLoaded -= CheckMedianCommons.Init;
             UninstallHarmony();
         }
 
