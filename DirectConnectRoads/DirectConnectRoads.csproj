@@ -86,13 +86,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="KianMod.cs" />
+    <Compile Include="LifeCycle\LifeCycle.cs" />
+    <Compile Include="LifeCycle\LoadingExtension.cs" />
+    <Compile Include="LifeCycle\Mod.cs" />
     <Compile Include="Math\MathUtil.cs" />
     <Compile Include="Math\VecetorUtils.cs" />
     <Compile Include="Patches\NetNodePatches\CheckMedianCommons.cs" />
     <Compile Include="Patches\NetNodePatches\RenderInstance.cs" />
     <Compile Include="Patches\TranspilerUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\NetInfoUtil.cs" />
     <Compile Include="Util\DirectConnectUtil.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\Log.cs" />
