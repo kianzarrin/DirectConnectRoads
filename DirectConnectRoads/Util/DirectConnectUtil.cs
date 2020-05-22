@@ -1,11 +1,13 @@
 namespace DirectConnectRoads.Util {
     using ColossalFramework;
     using CSUtil.Commons;
+    using DirectConnectRoads.Math;
     using System.Collections.Generic;
     using System.Linq;
     using TrafficManager.API.Traffic.Enums;
     using TrafficManager.Manager.Impl;
     using TrafficManager.UI;
+    using UnityEngine;
     using VectorUtil = Math.VectorUtil;
 
     public static class DirectConnectUtil {
@@ -71,24 +73,23 @@ namespace DirectConnectRoads.Util {
                    IsMedianBrokenHelper(segmentID2, segmentID1);
         }
 
-        public static bool IsMedianBrokenHelper(ushort segmentID1, ushort segmentID2) {
-            ushort nodeID = segmentID1.ToSegment().GetSharedNode(segmentID2);
-            bool startNode1 = NetUtil.IsStartNode(segmentID1, nodeID);
-            bool uturn = JunctionRestrictionsManager.Instance.IsUturnAllowed(segmentID1, startNode1);
-            if(uturn)return true;
+        public static bool IsMedianBrokenHelper(ushort segmentID, ushort otherSegmentID) {
+            ushort nodeID = segmentID.ToSegment().GetSharedNode(otherSegmentID);
 
-            GetGeometry(segmentID1, segmentID2, out var leftSegments, out var rightSegments);
-            foreach (ushort segmentID in rightSegments) {
-                var targetSegments = GetTargetSegments(segmentID, nodeID);
+            GetGeometry(segmentID, otherSegmentID, out var leftSegments, out var rightSegments);
+            leftSegments.Add(segmentID); // non of the left segments shall go to current segment.
+            rightSegments.Add(segmentID); // current segment shall not go to any of the left segments(including iteself)
+            //Log._Debug($"IsMedianBrokenHelper({segmentID} ,{otherSegmentID}) :\n" +
+            //    $"leftSegments={leftSegments.ToSTR()} , rightSegments={rightSegments.ToSTR()}");
+
+            foreach (ushort rightSegmentID in rightSegments) {
+                var targetSegments = GetTargetSegments(rightSegmentID, nodeID);
                 if (targetSegments.Intersect(leftSegments).Count() > 0) {
-                    Log._Debug($"intersection detected segment:{segmentID} targetSegments:{targetSegments.ToSTR()} leftSegments:{leftSegments.ToSTR()}");
-                    return true;
-                }
-                if (targetSegments.Contains(segmentID1)) {
-                    Log._Debug($"far left turn detected segment:{segmentID} targetSegments:{targetSegments.ToSTR()} segmentID1:{segmentID1}");
+                    //Log._Debug($"intersection detected rightSegmentID:{rightSegmentID} targetSegments:{targetSegments.ToSTR()} leftSegments:{leftSegments.ToSTR()}");
                     return true;
                 }
             }
+
             return false;
         }
         #endregion
@@ -103,17 +104,16 @@ namespace DirectConnectRoads.Util {
         /// <returns></returns>
         public static IEnumerable<ushort> GetTargetSegments(ushort sourceSegmentID, ushort nodeID) {
             foreach (ushort targetSegmentID in NetUtil.GetSegmentsCoroutine(nodeID)) {
-                if (SegmentGoToSegment(sourceSegmentID, targetSegmentID)){
+                if (DoesSegmentGoToSegment(sourceSegmentID, targetSegmentID, nodeID)){
                     yield return targetSegmentID;
                 }
             }
         }
 
         /// <summary>
-        /// Determines if any lanes from source segment go to the target segment
+        /// Determines if any lane from source segment goes to the target segment
         /// based on lane arrows and lane connections.
-        public static bool SegmentGoToSegment(ushort sourceSegmentID, ushort targetSegmentID) {
-            ushort nodeID = sourceSegmentID.ToSegment().GetSharedNode(targetSegmentID);
+        public static bool DoesSegmentGoToSegment(ushort sourceSegmentID, ushort targetSegmentID, ushort nodeID) {
             bool startNode = NetUtil.IsStartNode(sourceSegmentID, nodeID);
             if (sourceSegmentID == targetSegmentID) {
                 return JunctionRestrictionsManager.Instance.IsUturnAllowed(sourceSegmentID, startNode);
@@ -126,9 +126,11 @@ namespace DirectConnectRoads.Util {
                 LaneArrowManager.LANE_TYPES,
                 LaneArrowManager.VEHICLE_TYPES);
             foreach (LaneData sourceLane in sourceLanes) {
-                bool connected = false;
+                bool connected;
                 if (LaneConnectionManager.Instance.HasConnections(sourceLane.LaneID, startNode)) {
                     connected = IsLaneConnectedToSegment(sourceLane, targetSegmentID);
+                    //Log._Debug($"IsLaneConnectedToSegment({sourceLane},{targetSegmentID}) = {connected}");
+
                 } else {
                     LaneArrows arrows = LaneArrowManager.Instance.GetFinalLaneArrows(sourceLane.LaneID);
                     connected = arrows.IsFlagSet(arrow);
@@ -145,20 +147,19 @@ namespace DirectConnectRoads.Util {
         public static bool IsLaneConnectedToSegment(LaneData sourceLane, ushort targetSegmentID) {
             ushort sourceSegmentID = sourceLane.SegmentID;
             ushort nodeID = sourceSegmentID.ToSegment().GetSharedNode(targetSegmentID);
-            bool startNode = NetUtil.IsStartNode(sourceSegmentID, nodeID);
+            bool sourceStartNode = NetUtil.IsStartNode(sourceSegmentID, nodeID);
+            bool targetStartNode = NetUtil.IsStartNode(targetSegmentID, nodeID);
             var targetLanes = NetUtil.IterateLanes(
-                sourceSegmentID,
-                startNode,
-                LaneArrowManager.LANE_TYPES,
-                LaneArrowManager.VEHICLE_TYPES);
+                targetSegmentID,
+                !targetStartNode,// going away from start node.
+                LaneConnectionManager.LANE_TYPES,
+                LaneConnectionManager.VEHICLE_TYPES);
             foreach (LaneData targetLane in targetLanes) {
-                if (LaneConnectionManager.Instance.AreLanesConnected(sourceLane.LaneID, targetLane.LaneID, startNode))
+                if (LaneConnectionManager.Instance.AreLanesConnected(sourceLane.LaneID, targetLane.LaneID, sourceStartNode))
                     return true;
             }
             return false;
         }
-
-
 
         public static LaneArrows ArrowDir2LaneArrows(ArrowDirection arrowDir) {
             switch (arrowDir) {
@@ -186,22 +187,23 @@ namespace DirectConnectRoads.Util {
                 if (segmentID == 0 || segmentID == segmentID1 || segmentID == segmentID2)
                     continue;
                 var angle = GetSegmentsAngle(segmentID1, segmentID);
-                bool right = angle > angle0;
+                bool right = VectorUtil.CompareAngles_CCW_Right(source: angle0, target: angle);
+                //Log._Debug($"GetGeometry({segmentID1}, {segmentID2}) : segment:{segmentID}\n" +
+                //    $" CompareAngles_CCW_Right(angle0:{angle0*Mathf.Rad2Deg}, angle:{angle*Mathf.Rad2Deg}) -> {right}");
                 if (right)
                     rightSegments.Add(segmentID);
                 else
                     leftSegments.Add(segmentID);
             }
-            Log._Debug($"GetGeometry({segmentID1} ,{segmentID2}) -> " +
-                    $"leftSegments={leftSegments.ToSTR()} , rightSegments={rightSegments.ToSTR()}");
         }
 
         public static float GetSegmentsAngle(ushort from, ushort to) {
             ushort nodeID = from.ToSegment().GetSharedNode(to);
-            var dir1 = from.ToSegment().GetDirection(nodeID);
-            var dir2 = to.ToSegment().GetDirection(nodeID);
-            var ret = VectorUtil.SignedAngleRadCCW(dir1, dir2);
-            Log._Debug($"GetSegmentsAngle({from} , {to}) => {ret}");
+            Vector3 dir1 = from.ToSegment().GetDirection(nodeID);
+            Vector3 dir2 = to.ToSegment().GetDirection(nodeID);
+            float ret = VectorUtil.SignedAngleRadCCW(dir1.ToCS2D(), dir2.ToCS2D());
+            //Log._Debug($"SignedAngleRadCCW({dir1} , {dir2}) => {ret}\n"+
+            //           $"GetSegmentsAngle({from} , {to}) => {ret}");
             return ret;
         }
         #endregion

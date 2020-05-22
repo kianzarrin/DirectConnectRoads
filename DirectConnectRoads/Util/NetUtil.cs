@@ -391,5 +391,6 @@ namespace DirectConnectRoads.Util {
         public ushort SegmentID => LaneID.ToLane().m_segment;
         public ref NetSegment Segment => ref SegmentID.ToSegment();
         public ushort NodeID => StartNode ? Segment.m_startNode : Segment.m_endNode;
+        public override string ToString() => $"LaneData:[segment:{SegmentID} node:{NodeID} lane ID:{LaneID} {LaneInfo.m_laneType} {LaneInfo.m_vehicleType}]";
     }
 }

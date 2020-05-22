@@ -51,7 +51,7 @@ namespace DirectConnectRoads.Math {
         public static float SignedAngleRadCCW(Vector2 v1, Vector2 v2) {
             float dot = Vector2.Dot(v1, v2);
             float det = Determinent(v1, v2);
-            float angle = Mathf.Atan2(dot, det);
+            float angle = Mathf.Atan2(det, dot);
             return angle;
         }
 
@@ -59,6 +59,20 @@ namespace DirectConnectRoads.Math {
             float dot = Vector2.Dot(v1, v2);
             return MathUtil.EqualAprox(dot, -1, error);
         }
+
+        /// <summary>
+        /// calculates if <paramref name="target"/> angle is to the right of 0 and <paramref name="source"/> angle.
+        /// assuming input angles are (-pi,pi) CCW.
+        /// assuming all angles are unique non-zero
+        /// </summary>
+        /// <param name="source">angle to compare with</param>
+        /// <param name="target">angle being comapred</param>
+        public static bool CompareAngles_CCW_Right(float source, float target) {
+            if (source > 0)
+                return (0 < target) & (target < source);
+            return !CompareAngles_CCW_Right(-source, -target);
+        }
+
 
         public static Vector2 Rotate90CCW(this Vector2 v) => new Vector2(-v.y, +v.x);
         public static Vector2 PerpendicularCCW(this Vector2 v) => v.normalized.Rotate90CCW();
