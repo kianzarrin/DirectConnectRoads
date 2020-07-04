@@ -11,8 +11,8 @@ namespace DirectConnectRoads.LifeCycle {
         public static void Load() {
             CheckMedianCommons.Init();
             InstallHarmony();
-            NetInfoUtil.FixMaxTurnAngles();
             NetInfoUtil.LoadDCTextures();
+            NetInfoUtil.FixMaxTurnAngles();
         }
 
         public static void Unload() {

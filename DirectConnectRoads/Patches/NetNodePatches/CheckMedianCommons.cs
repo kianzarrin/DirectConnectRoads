@@ -19,15 +19,15 @@ namespace DirectConnectRoads.Patches {
             ushort targetSegmentID = nodeId.ToNode().GetSegment(targetSegmentIDX);
             NetInfo.Node nodeInfo = sourceSegmentID.ToSegment().Info.m_nodes[nodeInfoIDX];
             if (!DirectConnectUtil.IsMedian(nodeInfo, nodeId.ToNode().Info)) {
-                Log._Debug($"not a median: node:{nodeId} connect_group:{nodeInfo.m_connectGroup} vehcileTypes:{nodeId.ToNode().Info.m_vehicleTypes}");
+                Log.Debug($"not a median: node:{nodeId} connect_group:{nodeInfo.m_connectGroup} vehcileTypes:{nodeId.ToNode().Info.m_vehicleTypes}");
                 return true; // ignore.
             }
 
-            return !DirectConnectUtil.IsMedianBroken(sourceSegmentID, targetSegmentID);
+            return !DirectConnectUtil.OpenMedian(sourceSegmentID, targetSegmentID);
 
             if (TMPE_Exists_) {
                 try {
-                    return !DirectConnectUtil.IsMedianBroken(sourceSegmentID, targetSegmentID);
+                    return !DirectConnectUtil.OpenMedian(sourceSegmentID, targetSegmentID);
                 }
                 catch {
                     TMPE_Exists_ = false;

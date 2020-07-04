@@ -68,7 +68,13 @@ namespace DirectConnectRoads.Util {
         #endregion
 
         #region Broken Median detection
-        public static bool IsMedianBroken(ushort segmentID1, ushort segmentID2) {
+        public static bool OpenMedian(ushort segmentID1, ushort segmentID2) {
+            ushort nodeID = segmentID1.ToSegment().GetSharedNode(segmentID2);
+            bool connected = DoesSegmentGoToSegment(segmentID1, segmentID2, nodeID);
+            connected |= DoesSegmentGoToSegment(segmentID2, segmentID1, nodeID);
+            if (!connected)
+                return true;
+
             return IsMedianBrokenHelper(segmentID1, segmentID2) ||
                    IsMedianBrokenHelper(segmentID2, segmentID1);
         }
@@ -79,13 +85,13 @@ namespace DirectConnectRoads.Util {
             GetGeometry(segmentID, otherSegmentID, out var leftSegments, out var rightSegments);
             leftSegments.Add(segmentID); // non of the left segments shall go to current segment.
             rightSegments.Add(segmentID); // current segment shall not go to any of the left segments(including iteself)
-            //Log._Debug($"IsMedianBrokenHelper({segmentID} ,{otherSegmentID}) :\n" +
+            //Log.Debug($"IsMedianBrokenHelper({segmentID} ,{otherSegmentID}) :\n" +
             //    $"leftSegments={leftSegments.ToSTR()} , rightSegments={rightSegments.ToSTR()}");
 
             foreach (ushort rightSegmentID in rightSegments) {
                 var targetSegments = GetTargetSegments(rightSegmentID, nodeID);
                 if (targetSegments.Intersect(leftSegments).Count() > 0) {
-                    //Log._Debug($"intersection detected rightSegmentID:{rightSegmentID} targetSegments:{targetSegments.ToSTR()} leftSegments:{leftSegments.ToSTR()}");
+                    //Log.Debug($"intersection detected rightSegmentID:{rightSegmentID} targetSegments:{targetSegments.ToSTR()} leftSegments:{leftSegments.ToSTR()}");
                     return true;
                 }
             }
@@ -129,7 +135,7 @@ namespace DirectConnectRoads.Util {
                 bool connected;
                 if (LaneConnectionManager.Instance.HasConnections(sourceLane.LaneID, startNode)) {
                     connected = IsLaneConnectedToSegment(sourceLane, targetSegmentID);
-                    //Log._Debug($"IsLaneConnectedToSegment({sourceLane},{targetSegmentID}) = {connected}");
+                    //Log.Debug($"IsLaneConnectedToSegment({sourceLane},{targetSegmentID}) = {connected}");
 
                 } else {
                     LaneArrows arrows = LaneArrowManager.Instance.GetFinalLaneArrows(sourceLane.LaneID);
@@ -188,7 +194,7 @@ namespace DirectConnectRoads.Util {
                     continue;
                 var angle = GetSegmentsAngle(segmentID1, segmentID);
                 bool right = VectorUtil.CompareAngles_CCW_Right(source: angle0, target: angle);
-                //Log._Debug($"GetGeometry({segmentID1}, {segmentID2}) : segment:{segmentID}\n" +
+                //Log.Debug($"GetGeometry({segmentID1}, {segmentID2}) : segment:{segmentID}\n" +
                 //    $" CompareAngles_CCW_Right(angle0:{angle0*Mathf.Rad2Deg}, angle:{angle*Mathf.Rad2Deg}) -> {right}");
                 if (right)
                     rightSegments.Add(segmentID);
@@ -202,7 +208,7 @@ namespace DirectConnectRoads.Util {
             Vector3 dir1 = from.ToSegment().GetDirection(nodeID);
             Vector3 dir2 = to.ToSegment().GetDirection(nodeID);
             float ret = VectorUtil.SignedAngleRadCCW(dir1.ToCS2D(), dir2.ToCS2D());
-            //Log._Debug($"SignedAngleRadCCW({dir1} , {dir2}) => {ret}\n"+
+            //Log.Debug($"SignedAngleRadCCW({dir1} , {dir2}) => {ret}\n"+
             //           $"GetSegmentsAngle({from} , {to}) => {ret}");
             return ret;
         }
