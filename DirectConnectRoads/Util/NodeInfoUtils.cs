@@ -3,7 +3,7 @@ using UnityEngine;
 
 // TODO handle multiple junction nodes.
 namespace DirectConnectRoads {
-    using HideUnconnectedTracks.Utils;
+    using DirectConnectRoads.Utils;
     using System.Linq;
     using Util;
 
@@ -19,14 +19,23 @@ namespace DirectConnectRoads {
         }
 
         public static NetInfo.Node CreateDCNode(NetInfo.Node template, NetInfo netInfo) {
+            Log.Debug("CreateDCNode called for " + netInfo?.name);
+            var material = MaterialUtils.ContinuesMedianMaterial(netInfo);
+            var mesh = MaterialUtils.ContinuesMedianMesh(netInfo);
+            mesh = mesh?.CutOutRoadSides();
+            mesh?.Elevate();
+            if (mesh == null || material == null) return null;
+
+            mesh.name += "_DC";
+            material.name += "_DC";
             NetInfo.Node node = Copy(template);
-            node.m_nodeMaterial = MaterialUtils.ContinuesMedian(node.m_nodeMaterial, netInfo);
-            Mesh segmentMesh = MaterialUtils.ContinuesMedian(node.m_mesh, netInfo);
-            node.m_mesh = segmentMesh.CutOutRoadSides();
-            if (node.m_mesh == null || node.m_material == null)
-                return null;
+            node.m_mesh = node.m_nodeMesh = mesh;
+            node.m_material = node.m_nodeMaterial = material;
             node.m_directConnect = true;
             node.m_connectGroup = NetInfo.ConnectGroup.DoubleTrain;
+
+            Log.Debug("CreateDCNode sucessful for " + netInfo?.name);
+            node.m_nodeMesh.DumpMesh($"DC mesh for {netInfo.name}");
             return node;
         }
 

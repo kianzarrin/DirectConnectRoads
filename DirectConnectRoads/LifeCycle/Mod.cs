@@ -11,6 +11,7 @@ namespace DirectConnectRoads.LifeCycle
         public static string VersionString => ModVersion.ToString(2);
         public string Name => "Direct Connect Roads"+ VersionString;
         public string Description => "uses Direct Connect textures if TMPE rules suggests unbroken median";
+        public static bool IsEnabled = false;
 
         [UsedImplicitly]
         public void OnEnabled()
@@ -18,11 +19,13 @@ namespace DirectConnectRoads.LifeCycle
             HarmonyHelper.EnsureHarmonyInstalled();   
             if (Extensions.InGame)
                 LifeCycle.Load();
+            IsEnabled = true;
         }
 
         [UsedImplicitly]
         public void OnDisabled()
         {
+            IsEnabled = false;
             LifeCycle.Unload();
         }
     }

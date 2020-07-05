@@ -33,30 +33,18 @@ namespace DirectConnectRoads.Util {
             return segmentInfo;
         }
 
-        public static Material ContinuesMedian(Material material, NetInfo info, bool lod = false) {
-            if (material == null) throw new ArgumentNullException("material");
+        public static Material ContinuesMedianMaterial(NetInfo info, bool lod = false) {
             if (info == null) throw new ArgumentNullException("info");
             var segment = GetSegment(info, ID_APRMap);
-            var segMaterial = segment.m_material;
+            var segMaterial = segment?.m_material;
+            return segMaterial ? new Material(segMaterial) : null;
 
-            material = new Material(material);
-
-            Texture2D tex;
-            tex = segMaterial?.TryGetTexture2D(ID_Defuse);
-            if (tex != null) material.SetTexture(ID_Defuse, tex);
-            tex = segMaterial?.TryGetTexture2D(ID_APRMap);
-            if (tex != null) material.SetTexture(ID_APRMap, tex);
-            tex = segMaterial?.TryGetTexture2D(ID_XYSMap);
-            if (tex != null) material.SetTexture(ID_XYSMap, tex);
-
-            return material;
         }
 
-        public static Mesh ContinuesMedian(Mesh mesh, NetInfo info, bool lod = false) {
-            if (mesh == null) throw new ArgumentNullException("mesh");
+        public static Mesh ContinuesMedianMesh(NetInfo info, bool lod = false) {
             if (info == null) throw new ArgumentNullException("info");
             var segment = GetSegment(info, ID_APRMap);
-            return segment?.m_mesh??mesh;
+            return segment?.m_mesh;
         }
     } // end class
 } // end namesapce

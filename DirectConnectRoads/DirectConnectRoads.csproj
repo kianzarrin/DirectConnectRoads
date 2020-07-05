@@ -86,12 +86,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API.cs" />
     <Compile Include="LifeCycle\LifeCycle.cs" />
     <Compile Include="LifeCycle\LoadingExtension.cs" />
     <Compile Include="LifeCycle\Mod.cs" />
     <Compile Include="Math\MathUtil.cs" />
     <Compile Include="Math\VecetorUtils.cs" />
-    <Compile Include="NodeInfoExt.cs" />
+    <Compile Include="Util\NodeInfoUtils.cs" />
     <Compile Include="Util\MaterialUtils.cs" />
     <Compile Include="Util\MeshUtil.cs" />
     <Compile Include="ObjUnity3D\Extensions\MeshExt.cs" />

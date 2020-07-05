@@ -1,21 +1,39 @@
 using ColossalFramework.Math;
+using CSUtil.Commons;
 using ObjUnity3D;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using UnityEngine;
 
-namespace HideUnconnectedTracks.Utils {
+namespace DirectConnectRoads.Utils {
     public static class MeshUtil {
+        public const float ASPHALT_HEIGHT = -.3f;
+
         public static Mesh LoadMesh(string fileName) {
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
             var stream = executingAssembly.GetManifestResourceStream("HideUnconnectedTracks.Resources." + fileName);
             var mesh = new Mesh();
             mesh.LoadOBJ(OBJLoader.LoadOBJ(stream));
             return mesh;
+        }
+
+        public static void DumpMesh(this Mesh mesh, string fileName) {
+            foreach (char c in @"\/:<>|" + "\"") {
+                fileName = fileName.Replace(c.ToString(), "");
+            }
+
+            string dir = "DC_Dumps";
+            Directory.CreateDirectory(dir);
+            string path = Path.Combine(dir, fileName + ".obj");
+            Log._Debug($"dumping mesh {mesh.name} to " + path);
+            using (FileStream fs = new FileStream( Path.Combine(dir, fileName + ".obj"), FileMode.Create)) {
+                OBJLoader.ExportOBJ(mesh.EncodeOBJ(), fs);
+            }
         }
 
         public static Mesh CutMesh(this Mesh mesh, bool keepLeftSide) {
@@ -213,7 +231,7 @@ namespace HideUnconnectedTracks.Utils {
                     continue;
                 ret.Add(vector2);
             }
-            ret.Sort((lhs, rhs) => Math.Sign(lhs.x - rhs.x));
+            ret.Sort((lhs, rhs) => System.Math.Sign(lhs.x - rhs.x));
             return ret;
         }
 
@@ -222,7 +240,7 @@ namespace HideUnconnectedTracks.Utils {
 
             var crossSection = mesh.CrossSection().ToArray();
             for (int i= 1; i <= crossSection.Length/2; ++i){
-                if (EqualApprox(crossSection[i].y, -0.3f)){
+                if (EqualApprox(crossSection[i].y, ASPHALT_HEIGHT)){
                     left = crossSection[i].x;
                     break;
                 }
@@ -230,7 +248,7 @@ namespace HideUnconnectedTracks.Utils {
 
             crossSection = crossSection.Reverse().ToArray();
             for (int i = 1; i <= crossSection.Length / 2; ++i) {
-                if (EqualApprox(crossSection[i].y, -0.3f)) {
+                if (EqualApprox(crossSection[i].y, ASPHALT_HEIGHT)) {
                     right = crossSection[i].x;
                     break;
                 }
@@ -245,7 +263,27 @@ namespace HideUnconnectedTracks.Utils {
         public static Mesh CutOutRoadSides(this Mesh mesh) {
             if (!mesh.GetRoadSides(out float left, out float right))
                 return null;
-            return mesh.CutMeshGeneric2(vertex => left <= vertex.x && vertex.x <= right);
+            bool IsGoodFunc(Vector3 vertex) {
+                float x = vertex.x;
+                if (EqualApprox(x, left) || EqualApprox(x, right))
+                    return EqualApprox(vertex.y, ASPHALT_HEIGHT);
+                return left < vertex.x && vertex.x < right;
+            }
+            return mesh.CutMeshGeneric2(IsGoodFunc);
+        }
+
+        /// <summary>
+        /// to avoid flickering, we elevate the DC mesh a bit.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <param name="delta"></param>
+        public static void Elevate(this Mesh mesh, float delta = 1e-6f) {
+            var vertices = mesh.vertices;
+            for (int i=0;i< mesh.vertexCount; ++i)
+                vertices[i].y += delta;
+
+            mesh.vertices = vertices;
+            mesh.triangles = mesh.triangles; // triangles must be set last // redundant ?
         }
     }
 }

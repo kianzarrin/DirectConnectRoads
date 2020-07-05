@@ -41,15 +41,18 @@ namespace DirectConnectRoads.Util {
 
         public static bool HasDCMedian(NetInfo netInfo) {
             foreach (NetInfo.Node nodeInfo in netInfo.m_nodes) {
-                DirectConnectUtil.IsMedian(nodeInfo, netInfo);
-                return true;
+                bool isDC = nodeInfo.m_directConnect && nodeInfo.m_connectGroup != 0;
+                if(isDC && DirectConnectUtil.IsMedian(nodeInfo, netInfo))
+                    return true;
             }
             return false;
         }
 
         // must be called before FixMaxTurnAngles()
         public static void LoadDCTextures() {
-            foreach(NetInfo info in IterateRoadPrefabs()) {
+            AddedNodes = new List<NetInfo.Node>(100);
+            Log.Debug("LoadDCTextures() called");
+            foreach (NetInfo info in IterateRoadPrefabs()) {
                 if (HasDCMedian(info))
                     continue;
                 AddDCTextures(info);
@@ -64,6 +67,7 @@ namespace DirectConnectRoads.Util {
             netInfo.m_connectGroup |= node.m_connectGroup;
             netInfo.m_nodeConnectGroups |= node.m_connectGroup;
             netInfo.m_requireDirectRenderers = true;
+            AddedNodes.Add(node);
         }
 
         public static List<NetInfo.Node> AddedNodes;

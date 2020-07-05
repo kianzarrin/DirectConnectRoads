@@ -9,6 +9,7 @@ using UnityEngine;
 namespace DirectConnectRoads.LifeCycle {
     public static class LifeCycle {
         public static void Load() {
+            Log.Debug("LifeCycle.Load() called");
             CheckMedianCommons.Init();
             InstallHarmony();
             NetInfoUtil.LoadDCTextures();
@@ -16,6 +17,7 @@ namespace DirectConnectRoads.LifeCycle {
         }
 
         public static void Unload() {
+            Log.Debug("LifeCycle.Unload() called");
             UninstallHarmony();
             NetInfoUtil.RestoreMaxTurnAngles();
             NetInfoUtil.UnloadDCTextures();
