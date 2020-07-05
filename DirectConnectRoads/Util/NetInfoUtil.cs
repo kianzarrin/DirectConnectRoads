@@ -1,6 +1,8 @@
 using HarmonyLib;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DirectConnectRoads.Util {
@@ -18,15 +20,74 @@ namespace DirectConnectRoads.Util {
             return null;
         }
 
-        static string[] names_ = new string[] { "Medium Road", "Medium Road Decoration Trees", "Medium Road Decoration Grass" };
+        public static IEnumerable<NetInfo> IterateRoadPrefabs() {
+            int prefabCount = PrefabCollection<NetInfo>.PrefabCount();
+            int loadedCount = PrefabCollection<NetInfo>.LoadedCount();
+            Log.Info($"LoadDCTextures: prefabCount={prefabCount} LoadedCount={loadedCount}");
+            for (uint i = 0; i < loadedCount; ++i) {
+                NetInfo info = PrefabCollection<NetInfo>.GetLoaded(i);
+                if (!info) {
+                    Log.Warning("Skipping Bad prefab with null info");
+                    continue;
+                } else if (info.m_netAI == null) {
+                    Log.Warning("Skipping Bad prefab with null info.m_NetAI");
+                    continue;
+                }
+                if (!(info.m_netAI is RoadBaseAI))
+                    continue;
+                yield return info;
+            } // end for
+        }
+
+        public static bool HasDCMedian(NetInfo netInfo) {
+            foreach (NetInfo.Node nodeInfo in netInfo.m_nodes) {
+                DirectConnectUtil.IsMedian(nodeInfo, netInfo);
+                return true;
+            }
+            return false;
+        }
 
         // must be called before FixMaxTurnAngles()
         public static void LoadDCTextures() {
+            foreach(NetInfo info in IterateRoadPrefabs()) {
+                if (HasDCMedian(info))
+                    continue;
+                AddDCTextures(info);
+            } // end for
+        }
+
+        public static void AddDCTextures(NetInfo netInfo) {
+            var node = NodeInfoUtil.CreateDCNode(netInfo.m_nodes[0], netInfo);
+            if (node == null)
+                return;
+            netInfo.m_nodes = NodeInfoUtil.AddNode(netInfo.m_nodes, node);
+            netInfo.m_connectGroup |= node.m_connectGroup;
+            netInfo.m_nodeConnectGroups |= node.m_connectGroup;
+            netInfo.m_requireDirectRenderers = true;
+        }
+
+        public static List<NetInfo.Node> AddedNodes;
+
+        public static void UnloadDCTextures() {
+            foreach (NetInfo info in IterateRoadPrefabs())
+                RemoveDCTextures(info);
+        }
+
+        public static void RemoveDCTextures(NetInfo netInfo) {
+            var node = netInfo.m_nodes[netInfo.m_nodes.Length - 1];
+            if (AddedNodes.Contains(node)) {
+                netInfo.m_nodes = NodeInfoUtil.RemoveNode(netInfo.m_nodes, node);
+            }
+        }
+
+#if OLDCODE
+        static string[] names_ = new string[] { "Medium Road", "Medium Road Decoration Trees", "Medium Road Decoration Grass" };
+        public static void ManualLoad() {
             NetInfo sourceInfo = GetInfo("1319965985.4-Lane Road with Junction Median_Data");
             if (sourceInfo == null) return;
             foreach (var name in names_) {
                 var targetInfo = GetInfo(name);
-                if(targetInfo.m_nodes.Length==1) {
+                if (targetInfo.m_nodes.Length == 1) {
                     targetInfo.m_nodes = new[] { targetInfo.m_nodes[0], sourceInfo.m_nodes[1] };
                 }
                 targetInfo.m_connectGroup = sourceInfo.m_connectGroup;
@@ -35,7 +96,7 @@ namespace DirectConnectRoads.Util {
             }
         }
 
-        public static void UnloadDCTextures() {
+        public static void ManualUnLoad() {
             foreach (var name in names_) {
                 var info = GetInfo(name);
                 if (info == null)
@@ -48,6 +109,7 @@ namespace DirectConnectRoads.Util {
                 info.m_requireDirectRenderers = false;
             }
         }
+#endif
         #endregion
 
         #region MaxTurnAngle
@@ -105,6 +167,6 @@ namespace DirectConnectRoads.Util {
             }
             OriginalTurnAngles.Clear();
         }
-        #endregion
+#endregion
     }
 }

@@ -239,8 +239,11 @@ namespace HideUnconnectedTracks.Utils {
             return !float.IsNaN(left) && !float.IsNaN(right);
         }
 
+        /// <summary>
+        /// returns a new mesh without the road sides.
+        /// </summary>
         public static Mesh CutOutRoadSides(this Mesh mesh) {
-            if (!mesh.GetRoadSides(out var left, out var right))
+            if (!mesh.GetRoadSides(out float left, out float right))
                 return null;
             return mesh.CutMeshGeneric2(vertex => left <= vertex.x && vertex.x <= right);
         }

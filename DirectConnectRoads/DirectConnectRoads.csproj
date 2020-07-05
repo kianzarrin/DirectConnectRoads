@@ -91,6 +91,8 @@
     <Compile Include="LifeCycle\Mod.cs" />
     <Compile Include="Math\MathUtil.cs" />
     <Compile Include="Math\VecetorUtils.cs" />
+    <Compile Include="NodeInfoExt.cs" />
+    <Compile Include="Util\MaterialUtils.cs" />
     <Compile Include="Util\MeshUtil.cs" />
     <Compile Include="ObjUnity3D\Extensions\MeshExt.cs" />
     <Compile Include="ObjUnity3D\Extensions\StringExt.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\Log.cs" />
     <Compile Include="Util\NetUtil.cs" />
+    <Compile Include="Util\TextureUTILS.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
