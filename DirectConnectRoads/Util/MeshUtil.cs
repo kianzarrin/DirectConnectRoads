@@ -1,4 +1,3 @@
-using ColossalFramework.Math;
 using CSUtil.Commons;
 using ObjUnity3D;
 using System;
@@ -6,14 +5,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
 using UnityEngine;
 
 namespace DirectConnectRoads.Utils {
     public static class MeshUtil {
-        public const float ASPHALT_HEIGHT = -.3f;
-
         public static Mesh LoadMesh(string fileName) {
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
             var stream = executingAssembly.GetManifestResourceStream("HideUnconnectedTracks.Resources." + fileName);
@@ -206,84 +201,6 @@ namespace DirectConnectRoads.Utils {
             newMesh.tangents = newTangents;
             newMesh.triangles = newTriangleList.ToArray(); // triangle must be added after vertices.
             return newMesh;
-        }
-
-
-        static bool EqualApprox(float a, float b) {
-            var diff = a - b;
-            const float e = 1e-6f;
-            return diff * diff < e * e;
-        }
-
-        static bool Contains(List<Vector2> list, Vector2 vector) {
-            foreach(var item in list) {
-                if (item == vector)
-                    return true;
-            }
-            return false;
-        }
-
-        public static List<Vector2> CrossSection(this Mesh mesh) {
-            var ret = new List<Vector2>(mesh.vertexCount);
-            foreach (var vertex in mesh.vertices) {
-                Vector2 vector2 = VectorUtils.XY(vertex);
-                if (Contains(ret, vector2))
-                    continue;
-                ret.Add(vector2);
-            }
-            ret.Sort((lhs, rhs) => System.Math.Sign(lhs.x - rhs.x));
-            return ret;
-        }
-
-        public static bool GetRoadSides(this Mesh mesh, out float left, out float right) {
-            left = right = float.NaN;
-
-            var crossSection = mesh.CrossSection().ToArray();
-            for (int i= 1; i <= crossSection.Length/2; ++i){
-                if (EqualApprox(crossSection[i].y, ASPHALT_HEIGHT)){
-                    left = crossSection[i].x;
-                    break;
-                }
-            }
-
-            crossSection = crossSection.Reverse().ToArray();
-            for (int i = 1; i <= crossSection.Length / 2; ++i) {
-                if (EqualApprox(crossSection[i].y, ASPHALT_HEIGHT)) {
-                    right = crossSection[i].x;
-                    break;
-                }
-            }
-
-            return !float.IsNaN(left) && !float.IsNaN(right);
-        }
-
-        /// <summary>
-        /// returns a new mesh without the road sides.
-        /// </summary>
-        public static Mesh CutOutRoadSides(this Mesh mesh) {
-            if (!mesh.GetRoadSides(out float left, out float right))
-                return null;
-            bool IsGoodFunc(Vector3 vertex) {
-                float x = vertex.x;
-                if (EqualApprox(x, left) || EqualApprox(x, right))
-                    return EqualApprox(vertex.y, ASPHALT_HEIGHT);
-                return left < vertex.x && vertex.x < right;
-            }
-            return mesh.CutMeshGeneric2(IsGoodFunc);
-        }
-
-        /// <summary>
-        /// to avoid flickering, we elevate the DC mesh a bit.
-        /// </summary>
-        /// <param name="mesh"></param>
-        /// <param name="delta"></param>
-        public static void Elevate(this Mesh mesh, float delta = 1e-6f) {
-            var vertices = mesh.vertices;
-            for (int i=0;i< mesh.vertexCount; ++i)
-                vertices[i].y += delta;
-
-            mesh.vertices = vertices;
-            mesh.triangles = mesh.triangles; // triangles must be set last // redundant ?
         }
     }
 }

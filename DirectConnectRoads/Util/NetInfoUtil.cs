@@ -23,7 +23,7 @@ namespace DirectConnectRoads.Util {
         public static IEnumerable<NetInfo> IterateRoadPrefabs() {
             int prefabCount = PrefabCollection<NetInfo>.PrefabCount();
             int loadedCount = PrefabCollection<NetInfo>.LoadedCount();
-            Log.Info($"LoadDCTextures: prefabCount={prefabCount} LoadedCount={loadedCount}");
+            Log.Info($"IterateRoadPrefabs: prefabCount={prefabCount} LoadedCount={loadedCount}");
             for (uint i = 0; i < loadedCount; ++i) {
                 NetInfo info = PrefabCollection<NetInfo>.GetLoaded(i);
                 if (!info) {
@@ -60,14 +60,19 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void AddDCTextures(NetInfo netInfo) {
-            var node = NodeInfoUtil.CreateDCNode(netInfo.m_nodes[0], netInfo);
-            if (node == null)
-                return;
-            netInfo.m_nodes = NodeInfoUtil.AddNode(netInfo.m_nodes, node);
-            netInfo.m_connectGroup |= node.m_connectGroup;
-            netInfo.m_nodeConnectGroups |= node.m_connectGroup;
-            netInfo.m_requireDirectRenderers = true;
-            AddedNodes.Add(node);
+            try {
+                var node = NodeInfoUtil.CreateDCNode(netInfo.m_nodes[0], netInfo);
+                if (node == null)
+                    return;
+                netInfo.m_nodes = NodeInfoUtil.AddNode(netInfo.m_nodes, node);
+                netInfo.m_connectGroup |= node.m_connectGroup;
+                netInfo.m_nodeConnectGroups |= node.m_connectGroup;
+                netInfo.m_requireDirectRenderers = true;
+                AddedNodes.Add(node);
+            }
+            catch(Exception e) {
+                Log.Error(e.ToString());
+            }
         }
 
         public static List<NetInfo.Node> AddedNodes;

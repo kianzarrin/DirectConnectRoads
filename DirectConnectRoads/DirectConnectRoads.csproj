@@ -116,6 +116,7 @@
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\Log.cs" />
     <Compile Include="Util\NetUtil.cs" />
+    <Compile Include="Util\RoadMeshUtil.cs" />
     <Compile Include="Util\TextureUTILS.cs" />
   </ItemGroup>
   <ItemGroup>
