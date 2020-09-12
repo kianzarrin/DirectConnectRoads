@@ -264,7 +264,7 @@ namespace DirectConnectRoads.Util {
         /// </summary>
         public static IEnumerable<ushort> GetCCSegList(ushort nodeID) {
             ushort segmentID0 = GetFirstSegment(nodeID);
-            Extensions.Assert(segmentID0 != 0, "GetFirstSegment!=0");
+            Assertion.Assert(segmentID0 != 0, "GetFirstSegment!=0");
             yield return segmentID0;
             ushort segmentID = segmentID0;
 
@@ -283,7 +283,7 @@ namespace DirectConnectRoads.Util {
         /// </summary>
         public static IEnumerable<ushort> GetCWSegList(ushort nodeID) {
             ushort segmentID0 = GetFirstSegment(nodeID);
-            Extensions.Assert(segmentID0 != 0, "GetFirstSegment!=0");
+            Assertion.Assert(segmentID0 != 0, "GetFirstSegment!=0");
             yield return segmentID0;
             ushort segmentID = segmentID0;
 

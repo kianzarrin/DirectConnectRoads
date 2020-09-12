@@ -2,9 +2,11 @@ using HarmonyLib;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using KianCommons;
 
 namespace DirectConnectRoads.Patches {
-    using Util;
+    using DirectConnectRoads.Util;
+
     using static TranspilerUtils;
     public static class CheckMedianCommons {
         public static void Init()=> TMPE_Exists_ = true;
@@ -25,15 +27,15 @@ namespace DirectConnectRoads.Patches {
 
             return !DirectConnectUtil.OpenMedian(sourceSegmentID, targetSegmentID);
 
-            if (TMPE_Exists_) {
-                try {
-                    return !DirectConnectUtil.OpenMedian(sourceSegmentID, targetSegmentID);
-                }
-                catch {
-                    TMPE_Exists_ = false;
-                }
-            }
-            return true; // ignore
+            //if (TMPE_Exists_) {
+            //    try {
+            //        return !DirectConnectUtil.OpenMedian(sourceSegmentID, targetSegmentID);
+            //    }
+            //    catch {
+            //        TMPE_Exists_ = false;
+            //    }
+            //}
+            //return true; // ignore
         }
 
         static MethodInfo mShouldConnectMedian => typeof(CheckMedianCommons).GetMethod("ShouldConnectMedian");
@@ -41,8 +43,8 @@ namespace DirectConnectRoads.Patches {
         static FieldInfo f_m_nodes => typeof(NetInfo).GetField("m_nodes");
 
         public static void ApplyCheckMedian(List<CodeInstruction> codes, MethodInfo method, int occurance) {
-            Extensions.Assert(mCheckRenderDistance != null, "mCheckRenderDistance!=null failed");
-            Extensions.Assert(mShouldConnectMedian != null, "mShouldConnectMedian!=null failed");
+            Assertion.Assert(mCheckRenderDistance != null, "mCheckRenderDistance!=null failed");
+            Assertion.Assert(mShouldConnectMedian != null, "mShouldConnectMedian!=null failed");
             /*
             --->insert here
             [164 17 - 164 95]
@@ -60,7 +62,7 @@ namespace DirectConnectRoads.Patches {
 
             int index = 0;
             index = SearchInstruction(codes, new CodeInstruction(OpCodes.Callvirt, mCheckRenderDistance), index, counter: occurance);
-            Extensions.Assert(index != 0, "index!=0");
+            Assertion.Assert(index != 0, "index!=0");
             CodeInstruction LDLoc_NodeInfoIDX = Search_LDLoc_NodeInfoIDX(codes, index, counter: 1, dir: -1);
 
             //seek to <ldarg.s cameraInfo> instruction:
@@ -81,11 +83,11 @@ namespace DirectConnectRoads.Patches {
         } // end method
 
         public static CodeInstruction Search_LDLoc_NodeInfoIDX(List<CodeInstruction> codes, int index, int counter, int dir) {
-            Extensions.Assert(f_m_nodes != null, "f_m_nodes!=null failed");
+            Assertion.Assert(f_m_nodes != null, "f_m_nodes!=null failed");
             index = SearchInstruction(codes, new CodeInstruction(OpCodes.Ldfld, f_m_nodes), index, counter: counter, dir: dir);
 
             var code = codes[index + 1];
-            Extensions.Assert(IsLdLoc(code), $"IsLdLoc(code) | code={code}");
+            Assertion.Assert(IsLdLoc(code), $"IsLdLoc(code) | code={code}");
             return code;
         }
 

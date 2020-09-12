@@ -1,7 +1,7 @@
 namespace DirectConnectRoads.LifeCycle
 {
     using ICities;
-    using DirectConnectRoads.Util;
+    using KianCommons;
 
     public class LoadingExtention : LoadingExtensionBase
     {

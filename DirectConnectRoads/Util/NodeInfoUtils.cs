@@ -1,11 +1,7 @@
-using System;
-using UnityEngine;
-
 // TODO handle multiple junction nodes.
 namespace DirectConnectRoads {
-    using DirectConnectRoads.Utils;
-    using System.Linq;
-    using Util;
+    using KianCommons;
+    using DirectConnectRoads.Util;
 
     // [Serializable]
     public static class NodeInfoUtil{
@@ -14,7 +10,7 @@ namespace DirectConnectRoads {
         /// </summary>
         public static NetInfo.Node Copy(NetInfo.Node template) {
             NetInfo.Node node = new NetInfo.Node();
-            Extensions.CopyProperties<NetInfo.Node>(node, template);
+            AssemblyTypeExtensions.CopyProperties<NetInfo.Node>(node, template);
             return node;
         }
 

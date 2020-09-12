@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using KianCommons;
 using UnityEngine;
 
 namespace DirectConnectRoads.Util {
@@ -27,10 +28,10 @@ namespace DirectConnectRoads.Util {
             for (uint i = 0; i < loadedCount; ++i) {
                 NetInfo info = PrefabCollection<NetInfo>.GetLoaded(i);
                 if (!info) {
-                    Log.Warning("Skipping Bad prefab with null info");
+                    Log.Error("Warning:Skipping Bad prefab with null info");
                     continue;
                 } else if (info.m_netAI == null) {
-                    Log.Warning("Skipping Bad prefab with null info.m_NetAI");
+                    Log.Error("Warning:Skipping Bad prefab with null info.m_NetAI");
                     continue;
                 }
                 if (!(info.m_netAI is RoadBaseAI))
@@ -134,10 +135,10 @@ namespace DirectConnectRoads.Util {
                 try {
                     NetInfo netInfo = PrefabCollection<NetInfo>.GetLoaded(i);
                     if (netInfo == null) {
-                        Log.Warning("Bad prefab with null info");
+                        Log.Error("Warning:Bad prefab with null info");
                         continue;
                     } else if (netInfo.m_netAI == null) {
-                        Log.Warning("Bad prefab with null info.m_NetAI");
+                        Log.Error("Warning:Bad prefab with null info.m_NetAI");
                         continue;
                     }
                     if (netInfo.m_connectGroup == NetInfo.ConnectGroup.None)

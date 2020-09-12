@@ -4,7 +4,7 @@ namespace DirectConnectRoads.LifeCycle
     using JetBrains.Annotations;
     using ICities;
     using CitiesHarmony.API;
-    using DirectConnectRoads.Util;
+    using KianCommons;
     public class Mod : IUserMod
     {
         public static Version ModVersion => typeof(Mod).Assembly.GetName().Version;
@@ -17,7 +17,7 @@ namespace DirectConnectRoads.LifeCycle
         public void OnEnabled()
         {
             HarmonyHelper.EnsureHarmonyInstalled();   
-            if (Extensions.InGame)
+            if (HelpersExtensions.InGame)
                 LifeCycle.Load();
             IsEnabled = true;
         }

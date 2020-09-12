@@ -1,56 +1,28 @@
 using DirectConnectRoads.Patches;
-using DirectConnectRoads.Util;
+using KianCommons;
 using HarmonyLib;
 using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using DirectConnectRoads.Util;
 
 namespace DirectConnectRoads.LifeCycle {
     public static class LifeCycle {
         public static void Load() {
             Log.Debug("LifeCycle.Load() called");
             CheckMedianCommons.Init();
-            InstallHarmony();
+            HarmonyUtil.InstallHarmony(HarmonyId);
             NetInfoUtil.LoadDCTextures();
             NetInfoUtil.FixMaxTurnAngles();
         }
 
         public static void Unload() {
             Log.Debug("LifeCycle.Unload() called");
-            UninstallHarmony();
+            HarmonyUtil.UninstallHarmony(HarmonyId);
             NetInfoUtil.RestoreMaxTurnAngles();
             NetInfoUtil.UnloadDCTextures();
         }
-
-        #region Harmony
-        static bool installed = false;
         const string HarmonyId = "CS.kian.DirectConnectRoads";
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        static void InstallHarmony() {
-            if (!installed) {
-                Extensions.Log("DirectConnectRoads Patching...", true);
-#if DEBUG
-                //HarmonyInstance.DEBUG = true;
-#endif
-                Harmony harmony = new Harmony(HarmonyId);
-                harmony.PatchAll();
-                Extensions.Log("DirectConnectRoads Patching Completed!", true);
-                installed = true;
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        static void UninstallHarmony() {
-            if (installed) {
-                Harmony harmony = new Harmony(HarmonyId);
-                harmony.UnpatchAll(HarmonyId);
-                Extensions.Log("DirectConnectRoads patches Reverted.", true);
-                installed = false;
-            }
-        }
-        #endregion
-
     }
 }

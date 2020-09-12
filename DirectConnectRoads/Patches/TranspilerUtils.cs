@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using HarmonyLib;
+using KianCommons;
 
 namespace DirectConnectRoads.Patches {
     using System.Reflection;
     using Util;
     public static class TranspilerUtils {
         static void Log(object message) {
-            Extensions.Log("TRANSPILER " + message);
+            KianCommons.Log.Debug("TRANSPILER " + message);
         }
 
         public static List<CodeInstruction> ToCodeList(IEnumerable<CodeInstruction> instructions) {

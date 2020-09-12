@@ -9,16 +9,17 @@ using System.Collections.Generic;
 
 namespace DirectConnectRoads.Util {
 
+
     public static class Extensions {
         public static void CopyProperties(object target, object origin) {
             FieldInfo[] fields = origin.GetType().GetFields();
             foreach (FieldInfo fieldInfo in fields) {
-                //Extensions.Log($"Copying field:<{fieldInfo.Name}> ...>");
+                //Log.Debug($"Copying field:<{fieldInfo.Name}> ...>");
                 object value = fieldInfo.GetValue(origin);
                 string strValue = value?.ToString() ?? "null";
-                //Extensions.Log($"Got field value:<{strValue}> ...>");
+                //Log.Debug($"Got field value:<{strValue}> ...>");
                 fieldInfo.SetValue(target, value);
-                //Extensions.Log($"Copied field:<{fieldInfo.Name}> value:<{strValue}>");
+                //Log.Debug($"Copied field:<{fieldInfo.Name}> value:<{strValue}>");
             }
         }
 
@@ -27,28 +28,16 @@ namespace DirectConnectRoads.Util {
             Assert(origin is T, "origin is T");
             FieldInfo[] fields = typeof(T).GetFields();
             foreach (FieldInfo fieldInfo in fields) {
-                //Extensions.Log($"Copying field:<{fieldInfo.Name}> ...>");
+                //Log.Debug($"Copying field:<{fieldInfo.Name}> ...>");
                 object value = fieldInfo.GetValue(origin);
                 //string strValue = value?.ToString() ?? "null";
-                //Extensions.Log($"Got field value:<{strValue}> ...>");
+                //Log.Debug($"Got field value:<{strValue}> ...>");
                 fieldInfo.SetValue(target, value);
-                //Extensions.Log($"Copied field:<{fieldInfo.Name}> value:<{strValue}>");
+                //Log.Debug($"Copied field:<{fieldInfo.Name}> value:<{strValue}>");
             }
         }
 
-        public static T Max<T>()
-            where T : Enum =>
-           System.Enum.GetValues(typeof(T)).Cast<T>().Max();
 
-        public static void SetBit(this ref byte b, int idx) => b |= (byte)(1 << idx);
-        public static void ClearBit(this ref byte b, int idx) => b &= ((byte)~(1 << idx));
-        public static bool GetBit(this byte b, int idx) => (b & (byte)(1 << idx)) != 0;
-        public static void SetBit(this ref byte b, int idx, bool value) {
-            if (value)
-                b.SetBit(idx);
-            else
-                b.ClearBit(idx);
-        }
 
         internal static AppMode currentMode => SimulationManager.instance.m_ManagersWrapper.loading.currentMode;
         internal static bool CheckGameMode(AppMode mode) => CheckGameMode(new[] { mode });

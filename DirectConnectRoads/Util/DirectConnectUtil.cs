@@ -6,8 +6,8 @@ namespace DirectConnectRoads.Util {
     using System.Linq;
     using TrafficManager.API.Traffic.Enums;
     using TrafficManager.Manager.Impl;
-    using TrafficManager.UI;
     using UnityEngine;
+    using KianCommons;
     using VectorUtil = Math.VectorUtil;
 
     public static class DirectConnectUtil {
@@ -109,7 +109,7 @@ namespace DirectConnectRoads.Util {
         /// <param name="nodeID"></param>
         /// <returns></returns>
         public static IEnumerable<ushort> GetTargetSegments(ushort sourceSegmentID, ushort nodeID) {
-            foreach (ushort targetSegmentID in NetUtil.GetSegmentsCoroutine(nodeID)) {
+            foreach (ushort targetSegmentID in NetUtil.IterateNodeSegments(nodeID)) {
                 if (DoesSegmentGoToSegment(sourceSegmentID, targetSegmentID, nodeID)){
                     yield return targetSegmentID;
                 }
