@@ -129,7 +129,7 @@ namespace DirectConnectRoads.Util {
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="delta"></param>
-        public static void Elevate(this Mesh mesh, float delta = 1e-6f) {
+        public static void Elevate(this Mesh mesh, float delta = 1e-2f) {
             var vertices = mesh.vertices;
             for (int i = 0; i < mesh.vertexCount; ++i)
                 vertices[i].y += delta;
