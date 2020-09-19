@@ -17,6 +17,19 @@ namespace DirectConnectRoads.Util {
         }
         internal static int[] texIDs => new int[] { ID_Defuse, ID_APRMap, ID_XYSMap };
 
+        public static Texture2D TryGetTexture2D(this Material material, int textureID) {
+            try {
+                if (material.HasProperty(textureID)) {
+                    Texture texture = material.GetTexture(textureID);
+                    if (texture is Texture2D)
+                        return texture as Texture2D;
+                }
+            }
+            catch { }
+            //Log.Info($"Warning: failed to get {getTexName(textureID)} texture from material :" + material.name);
+            return null;
+        }
+
         public static UITextureAtlas GetAtlas(string name) {
             UITextureAtlas[] atlases = Resources.FindObjectsOfTypeAll(typeof(UITextureAtlas)) as UITextureAtlas[];
             foreach(var atlas in atlases) {
@@ -71,5 +84,19 @@ namespace DirectConnectRoads.Util {
             if (lod) texture.Apply();
             else texture.Apply(true, true);
         }
+
+        public static void Fade(this Texture2D texture, float alpha = 0.5f) {
+            Log.Info($"Fading {texture.name} alpha:{alpha}");
+
+            var colors = texture.GetPixels();
+            for(int i = 0; i < colors.Length; ++i) {
+                colors[i].a *= alpha;
+            }
+            texture.SetPixels(colors);
+
+            texture.Apply();
+            texture.name += $".Fade(alpha={alpha})";
+        }
+
     }
 }

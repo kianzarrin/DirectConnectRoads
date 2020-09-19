@@ -10,7 +10,7 @@ namespace DirectConnectRoads.Util {
 
         static bool EqualApprox(float a, float b) {
             var diff = a - b;
-            const float e = 1e-6f;
+            const float e = 1e-3f;
             return diff * diff < e * e;
         }
 
@@ -91,7 +91,10 @@ namespace DirectConnectRoads.Util {
             left = right = float.NaN;
 
             var crossSection = mesh.CrossSection().ToArray();
+            Log.Debug($"cross section for mesh:{mesh} is " + crossSection.ToSTR("f4"),false);
+
             for (int i = 1; i <= crossSection.Length / 2; ++i) {
+                //Log.Debug("assesing vertex " + crossSection[i].ToString("e"),false);
                 if (EqualApprox(crossSection[i].y, ASPHALT_HEIGHT)) {
                     left = crossSection[i].x;
                     break;
@@ -105,7 +108,7 @@ namespace DirectConnectRoads.Util {
                     break;
                 }
             }
-
+            Log.Debug($"left={left} right={right}",false);
             return !float.IsNaN(left) && !float.IsNaN(right);
         }
 

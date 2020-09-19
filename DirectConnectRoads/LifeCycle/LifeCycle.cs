@@ -15,11 +15,13 @@ namespace DirectConnectRoads.LifeCycle {
             HarmonyUtil.InstallHarmony(HarmonyId);
             NetInfoUtil.LoadDCTextures();
             NetInfoUtil.FixMaxTurnAngles();
+            NetInfoUtil.FixDCFlags();
         }
 
         public static void Unload() {
             Log.Debug("LifeCycle.Unload() called");
             HarmonyUtil.UninstallHarmony(HarmonyId);
+            NetInfoUtil.RestoreFlags();
             NetInfoUtil.RestoreMaxTurnAngles();
             NetInfoUtil.UnloadDCTextures();
         }

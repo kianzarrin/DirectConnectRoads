@@ -120,7 +120,6 @@
     <Compile Include="Math\MathUtil.cs" />
     <Compile Include="Math\VecetorUtils.cs" />
     <Compile Include="Util\NodeInfoUtils.cs" />
-    <Compile Include="Util\MaterialUtils.cs" />
     <Compile Include="KianCommons\KianCommons\Util\MeshUtil.cs" />
     <Compile Include="KianCommons\KianCommons\ObjUnity3D\Extensions\MeshExt.cs" />
     <Compile Include="KianCommons\KianCommons\ObjUnity3D\Extensions\StringExt.cs" />
@@ -136,7 +135,6 @@
     <Compile Include="KianCommons\KianCommons\ObjUnity3D\OBJMaterial.cs" />
     <Compile Include="Patches\NetNodePatches\CheckMedianCommons.cs" />
     <Compile Include="Patches\NetNodePatches\RenderInstance.cs" />
-    <Compile Include="Patches\TranspilerUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\NetInfoUtil.cs" />
     <Compile Include="Util\DirectConnectUtil.cs" />

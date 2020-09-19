@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Collections.Generic;
 using KianCommons;
+using KianCommons.Patches;
 
 namespace DirectConnectRoads.Patches.NetNodePatches {
     [HarmonyPatch()]

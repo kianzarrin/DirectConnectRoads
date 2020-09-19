@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using UnityEngine;
+using KianCommons;
 
 // TODO check out material.MainTextureScale
 // regarding weird nodes, what if we return a copy of the material?
@@ -22,30 +23,35 @@ namespace DirectConnectRoads.Util {
             return null;
         }
 
-        public static NetInfo.Segment GetSegment(NetInfo info, int textureID) {
-            NetInfo.Segment segmentInfo = null;
-            foreach (var segmentInfo2 in info.m_segments ?? Enumerable.Empty<NetInfo.Segment>()) {
-                if (segmentInfo2.m_segmentMaterial.TryGetTexture2D(textureID) != null) {
-                    segmentInfo = segmentInfo2;
-                    break;
-                }
-            }
-            return segmentInfo;
-        }
+        //public static NetInfo.Segment GetSegment(NetInfo info, int textureID) {
+        //    foreach (var segmentInfo in info.m_segments ?? Enumerable.Empty<NetInfo.Segment>()) {
+        //        if (!segmentInfo.CheckFlags(NetSegment.Flags.None, out _))
+        //            continue;
+        //        Log.Debug($"segmentInfo={segmentInfo.m_mesh.name} " +
+        //            $"texture={segmentInfo.m_segmentMaterial.TryGetTexture2D(textureID)}", false);
+        //        if (!segmentInfo.m_segmentMaterial.TryGetTexture2D(textureID))
+        //            continue;
+        //        Log.Debug($"GetSegment -> segmentInfo={segmentInfo.m_mesh.name} " +
+        //            $"texture={segmentInfo.m_segmentMaterial.TryGetTexture2D(textureID)}", false);
 
-        public static Material ContinuesMedianMaterial(NetInfo info, bool lod = false) {
-            if (info == null) throw new ArgumentNullException("info");
-            var segment = GetSegment(info, ID_APRMap);
-            var segMaterial = segment?.m_material;
-            return segMaterial ? new Material(segMaterial) : null;
+        //        return segmentInfo;
+        //    }
+        //    return null;
+        //}
 
-        }
+        //public static Material ContinuesMedianMaterial(NetInfo info, bool lod = false) {
+        //    if (info == null) throw new ArgumentNullException("info");
+        //    var segment = GetSegment(info, ID_APRMap);
+        //    var segMaterial = segment?.m_material;
+        //    return segMaterial ? new Material(segMaterial) : null;
 
-        public static Mesh ContinuesMedianMesh(NetInfo info, bool lod = false) {
-            if (info == null) throw new ArgumentNullException("info");
-            var segment = GetSegment(info, ID_APRMap);
-            return segment?.m_mesh;
-        }
+        //}
+
+        //public static Mesh ContinuesMedianMesh(NetInfo info, bool lod = false) {
+        //    if (info == null) throw new ArgumentNullException("info");
+        //    var segment = GetSegment(info, ID_APRMap);
+        //    return segment?.m_mesh;
+        //}
     } // end class
 } // end namesapce
 

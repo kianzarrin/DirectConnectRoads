@@ -1,7 +1,9 @@
-// TODO handle multiple junction nodes.
+// TODO handle multiple NetInfo.segment .
 namespace DirectConnectRoads {
     using KianCommons;
     using DirectConnectRoads.Util;
+    using System.Collections.Generic;
+    using UnityEngine;
 
     // [Serializable]
     public static class NodeInfoUtil{
@@ -14,25 +16,62 @@ namespace DirectConnectRoads {
             return node;
         }
 
-        public static NetInfo.Node CreateDCNode(NetInfo.Node template, NetInfo netInfo) {
-            Log.Debug("CreateDCNode called for " + netInfo?.name);
-            var material = MaterialUtils.ContinuesMedianMaterial(netInfo);
-            var mesh = MaterialUtils.ContinuesMedianMesh(netInfo);
-            mesh = mesh?.CutOutRoadSides();
-            mesh?.Elevate();
-            if (mesh == null || material == null) return null;
 
-            mesh.name += "_DC";
-            material.name += "_DC";
-            NetInfo.Node node = Copy(template);
-            node.m_mesh = node.m_nodeMesh = mesh;
-            node.m_material = node.m_nodeMaterial = material;
-            node.m_directConnect = true;
-            node.m_connectGroup = NetInfo.ConnectGroup.DoubleTrain;
+        static bool IsSegmentInfoSuitable(NetInfo.Segment segmentInfo) {
+            if (segmentInfo == null) return false;
+            if (!segmentInfo.m_mesh || !segmentInfo.m_material)
+                return false;
+            if (!segmentInfo.m_material.TryGetTexture2D(TextureUtils.ID_Defuse))
+                return false;
+            return segmentInfo.CheckFlags(NetSegment.Flags.None, out _);
+        }
 
-            Log.Debug("CreateDCNode sucessful for " + netInfo?.name);
-            node.m_nodeMesh.DumpMesh($"DC mesh for {netInfo.name}");
-            return node;
+        public static IEnumerable<NetInfo.Node> CreateDCNode(NetInfo.Node template, NetInfo netInfo) {
+            Assertion.AssertNotNull(netInfo, "netInfo");
+            Log.Debug("CreateDCNode called for " + netInfo.name);
+            var ret = new List<NetInfo.Node>();
+            for (int i = 0; i < netInfo.m_segments.Length; ++i) {
+                var segmentInfo = netInfo.m_segments[i];
+                if (!IsSegmentInfoSuitable(segmentInfo)) {
+                    Log.Debug($"Skiping segment[{i}]",false);
+                    continue;
+                }
+                Log.Debug($"processing segment[{i}]", false);
+                var material = new Material(segmentInfo.m_material);
+                var mesh = segmentInfo.m_mesh;
+                Log.Debug("[1] mesh=" + mesh?.name ?? "null", false);
+                mesh = mesh?.CutOutRoadSides();
+                mesh?.Elevate();
+                Log.Debug("[2] mesh=" + mesh?.name ?? "null", false);
+                if (mesh == null || material == null) continue;
+
+                mesh.name += "_DC";
+                material.name += "_DC";
+                //{
+                //    var c = material.color;
+                //    c.a = 0.01f;
+                //    material.color = c;
+
+                //    var tex = material.TryGetTexture2D(TextureUtils.ID_Defuse);
+                //    tex = tex.GetReadableCopy();
+                //    tex.Fade(0.1f);
+                //    material.SetTexture(TextureUtils.ID_Defuse, tex);
+                //}
+
+
+                NetInfo.Node node = Copy(template);
+                node.m_mesh = node.m_nodeMesh = mesh;
+                node.m_material = node.m_nodeMaterial = material;
+                node.m_directConnect = true;
+                node.m_connectGroup = NetInfo.ConnectGroup.DoubleTrain;
+                node.m_emptyTransparent = true;
+
+                Log.Debug("CreateDCNode sucessful for " + netInfo?.name);
+                node.m_nodeMesh.DumpMesh($"DC mesh for {netInfo.name}");
+                ret.Add(node);
+            }
+            return ret;
+
         }
 
         public static NetInfo.Node[] AddNode(NetInfo.Node[] nodeArray, NetInfo.Node node) {

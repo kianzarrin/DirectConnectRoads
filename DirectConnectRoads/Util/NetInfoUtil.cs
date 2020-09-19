@@ -54,22 +54,27 @@ namespace DirectConnectRoads.Util {
             AddedNodes = new List<NetInfo.Node>(100);
             Log.Debug("LoadDCTextures() called");
             foreach (NetInfo info in IterateRoadPrefabs()) {
+                if (info == null || info.m_nodes.Length == 0)
+                    continue;
                 if (HasDCMedian(info))
                     continue;
+                //if (info.name != "1847143370.Medium Four Lane Road_Data")
+                //    continue; // TODO DELETE
                 AddDCTextures(info);
             } // end for
         }
 
         public static void AddDCTextures(NetInfo netInfo) {
             try {
-                var node = NodeInfoUtil.CreateDCNode(netInfo.m_nodes[0], netInfo);
-                if (node == null)
-                    return;
-                netInfo.m_nodes = NodeInfoUtil.AddNode(netInfo.m_nodes, node);
-                netInfo.m_connectGroup |= node.m_connectGroup;
-                netInfo.m_nodeConnectGroups |= node.m_connectGroup;
-                netInfo.m_requireDirectRenderers = true;
-                AddedNodes.Add(node);
+                var nodes = NodeInfoUtil.CreateDCNode(netInfo.m_nodes[0], netInfo);
+                if (nodes == null) return;
+                foreach (var node in nodes) {
+                    netInfo.m_nodes = NodeInfoUtil.AddNode(netInfo.m_nodes, node);
+                    netInfo.m_connectGroup |= node.m_connectGroup;
+                    netInfo.m_nodeConnectGroups |= node.m_connectGroup;
+                    netInfo.m_requireDirectRenderers = true;
+                    AddedNodes.Add(node);
+                }
             }
             catch(Exception e) {
                 Log.Error(e.ToString());
@@ -177,6 +182,47 @@ namespace DirectConnectRoads.Util {
             }
             OriginalTurnAngles.Clear();
         }
-#endregion
+        #endregion
+
+        #region fix flags
+        public static Hashtable OriginalForbiddenFalgs = new Hashtable();
+        public static void FixDCFlags() {
+            int loadedCount = PrefabCollection<NetInfo>.LoadedCount();
+            for (uint i = 0; i < loadedCount; ++i) {
+                try {
+                    NetInfo netInfo = PrefabCollection<NetInfo>.GetLoaded(i);
+                    if (netInfo?.m_netAI == null || netInfo.m_nodes == null) continue;
+                    foreach (var nodeInfo in netInfo.m_nodes) {
+                        if (!nodeInfo.m_directConnect) continue;
+                        bool isMedian = DirectConnectUtil.IsMedian(nodeInfo: nodeInfo, netInfo: netInfo);
+                        if (!isMedian) continue;
+
+                        var flags = nodeInfo.m_flagsForbidden & ~(NetNode.Flags.Transition | NetNode.Flags.TrafficLights);
+                        if(nodeInfo.m_flagsForbidden != flags) {
+                            OriginalForbiddenFalgs[netInfo] = nodeInfo.m_flagsForbidden;
+                            nodeInfo.m_flagsForbidden = flags;
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    Log.Error(e.ToString());
+                }
+            } // end for            
+        }
+
+        public static void RestoreFlags() {
+            foreach (NetInfo.Node nodeInfo in OriginalForbiddenFalgs.Keys) {
+                try {
+                    Assertion.AssertNotNull(nodeInfo, "item");
+                    var flags = (NetNode.Flags)OriginalForbiddenFalgs[nodeInfo];
+                    nodeInfo.m_flagsForbidden = flags;
+                } catch (Exception e) {
+                    Log.Error(e.Message);
+                }
+            }
+            OriginalForbiddenFalgs.Clear();
+        }
+        #endregion
+
     }
 }

@@ -7,7 +7,7 @@ using KianCommons;
 namespace DirectConnectRoads.Patches {
     using DirectConnectRoads.Util;
 
-    using static TranspilerUtils;
+    using static KianCommons.Patches.TranspilerUtils;
     public static class CheckMedianCommons {
         public static void Init()=> TMPE_Exists_ = true;
 
@@ -19,23 +19,15 @@ namespace DirectConnectRoads.Patches {
             ushort sourceSegmentID = nodeId.ToNode().GetSegment(data.m_dataInt0 & 7);
             int targetSegmentIDX = data.m_dataInt0 >> 4;
             ushort targetSegmentID = nodeId.ToNode().GetSegment(targetSegmentIDX);
-            NetInfo.Node nodeInfo = sourceSegmentID.ToSegment().Info.m_nodes[nodeInfoIDX];
-            if (!DirectConnectUtil.IsMedian(nodeInfo, nodeId.ToNode().Info)) {
-                Log.Debug($"not a median: node:{nodeId} connect_group:{nodeInfo.m_connectGroup} vehcileTypes:{nodeId.ToNode().Info.m_vehicleTypes}");
+            NetInfo info = sourceSegmentID.ToSegment().Info;
+            NetInfo.Node nodeInfo = info.m_nodes[nodeInfoIDX];
+            if (!DirectConnectUtil.IsMedian(nodeInfo, info)) {
+                //Log.Debug($"not a median: node:{nodeId} connect_group:{nodeInfo.m_connectGroup} " +
+                //    $"vehcileTypes:{info.m_vehicleTypes}",false);
                 return true; // ignore.
             }
-
             return !DirectConnectUtil.OpenMedian(sourceSegmentID, targetSegmentID);
-
-            //if (TMPE_Exists_) {
-            //    try {
-            //        return !DirectConnectUtil.OpenMedian(sourceSegmentID, targetSegmentID);
-            //    }
-            //    catch {
-            //        TMPE_Exists_ = false;
-            //    }
-            //}
-            //return true; // ignore
+                //.LogRet($"ShouldConnectMedian(sourceSegmentID={sourceSegmentID}, targetSegmentID={targetSegmentID})->");
         }
 
         static MethodInfo mShouldConnectMedian => typeof(CheckMedianCommons).GetMethod("ShouldConnectMedian");
