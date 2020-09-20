@@ -26,7 +26,7 @@ namespace DirectConnectRoads {
             return segmentInfo.CheckFlags(NetSegment.Flags.None, out _);
         }
 
-        public static IEnumerable<NetInfo.Node> CreateDCNode(NetInfo.Node template, NetInfo netInfo) {
+        public static IEnumerable<NetInfo.Node> CreateDCNodes(NetInfo.Node template, NetInfo netInfo) {
             Assertion.AssertNotNull(netInfo, "netInfo");
             Log.Debug("CreateDCNode called for " + netInfo.name);
             var ret = new List<NetInfo.Node>();

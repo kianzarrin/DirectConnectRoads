@@ -66,7 +66,7 @@ namespace DirectConnectRoads.Util {
 
         public static void AddDCTextures(NetInfo netInfo) {
             try {
-                var nodes = NodeInfoUtil.CreateDCNode(netInfo.m_nodes[0], netInfo);
+                var nodes = NodeInfoUtil.CreateDCNodes(netInfo.m_nodes[0], netInfo);
                 if (nodes == null) return;
                 foreach (var node in nodes) {
                     netInfo.m_nodes = NodeInfoUtil.AddNode(netInfo.m_nodes, node);
