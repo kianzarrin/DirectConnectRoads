@@ -51,11 +51,16 @@ namespace DirectConnectRoads.Util {
             return false;
         }
 
+
+
+        public static HashSet<NetInfo> UnsupportedRoadWithTrackTable = new HashSet<NetInfo>();
+
         /// <summary>
         /// returns true if too many tracks 
         /// or if tracks are too far apart.
         /// </summary>
         public static bool UnsupportedRoadWithTrack(NetInfo info) {
+            Log.Debug($"UnsupportedRoadWithTrack({info.name} called", false);
             var trainTracks = new List<NetInfo.Lane>();
             var tramTracks = new List<NetInfo.Lane>();
             var MetroTracks = new List<NetInfo.Lane>();
@@ -77,6 +82,7 @@ namespace DirectConnectRoads.Util {
 
             if (tramTracks.Count == 2) {
                 var dist = Mathf.Abs(tramTracks[0].m_position - tramTracks[1].m_position);
+                Log.Debug($"UnsupportedRoadWithTrack({info.name} tram dist = " + dist, false);
                 if (dist > 6.3f) return true;
             }
 
@@ -99,13 +105,16 @@ namespace DirectConnectRoads.Util {
         // must be called before FixMaxTurnAngles()
         public static void LoadDCTextures() {
             AddedNodes = new List<NetInfo.Node>(100);
-            Log.Debug("LoadDCTextures() called");
+            Log.Info("LoadDCTextures() called");
             foreach (NetInfo info in IterateRoadPrefabs()) {
                 if (info == null || info.m_nodes.Length == 0)
                     continue;
-                if (HasDCMedian(info))
+                if (UnsupportedRoadWithTrack(info)) {
+                    Log.Debug($"UnsupportedRoadWithTrackTable.Add({info})",false);
+                    UnsupportedRoadWithTrackTable.Add(info);
                     continue;
-                if (UnsupportedRoadWithTrack(info))
+                }
+                if (HasDCMedian(info))
                     continue;
                 //if (info.name != "1847143370.Medium Four Lane Road_Data")
                 //    continue; // TODO DELETE

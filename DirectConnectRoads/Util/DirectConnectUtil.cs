@@ -1,14 +1,14 @@
 namespace DirectConnectRoads.Util {
     using ColossalFramework;
     using CSUtil.Commons;
-    using DirectConnectRoads.Math;
+    using KianCommons.Math;
     using System.Collections.Generic;
     using System.Linq;
     using TrafficManager.API.Traffic.Enums;
     using TrafficManager.Manager.Impl;
     using UnityEngine;
     using KianCommons;
-    using VectorUtil = Math.VectorUtil;
+    using VectorUtil = KianCommons.Math.VectorUtil;
 
     public static class DirectConnectUtil {
         #region Median Texture Detection

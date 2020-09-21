@@ -21,6 +21,9 @@ namespace DirectConnectRoads.Patches {
             ushort targetSegmentID = nodeId.ToNode().GetSegment(targetSegmentIDX);
             NetInfo info = sourceSegmentID.ToSegment().Info;
             NetInfo.Node nodeInfo = info.m_nodes[nodeInfoIDX];
+            if (NetInfoUtil.UnsupportedRoadWithTrackTable.Contains(info)) {
+                return true; // ignore
+            }
             if (!DirectConnectUtil.IsMedian(nodeInfo, info)) {
                 //Log.Debug($"not a median: node:{nodeId} connect_group:{nodeInfo.m_connectGroup} " +
                 //    $"vehcileTypes:{info.m_vehicleTypes}",false);
