@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using KianCommons;
 using UnityEngine;
+using ColossalFramework;
+using static KianCommons.Math.MathUtil;
 
 namespace DirectConnectRoads.Util {
     public static class NetInfoUtil {
@@ -49,6 +51,51 @@ namespace DirectConnectRoads.Util {
             return false;
         }
 
+        /// <summary>
+        /// returns true if too many tracks 
+        /// or if tracks are too far apart.
+        /// </summary>
+        public static bool UnsupportedRoadWithTrack(NetInfo info) {
+            var trainTracks = new List<NetInfo.Lane>();
+            var tramTracks = new List<NetInfo.Lane>();
+            var MetroTracks = new List<NetInfo.Lane>();
+            var monoTracks = new List<NetInfo.Lane>();
+            foreach (var lane in info.m_lanes) {
+                if (lane.m_vehicleType.IsFlagSet(VehicleInfo.VehicleType.Train)) {
+                    trainTracks.Add(lane);
+                } else if (lane.m_vehicleType.IsFlagSet(VehicleInfo.VehicleType.Tram)) {
+                    tramTracks.Add(lane);
+                } else if (lane.m_vehicleType.IsFlagSet(VehicleInfo.VehicleType.Metro)) {
+                    MetroTracks.Add(lane);
+                } else if (lane.m_vehicleType.IsFlagSet(VehicleInfo.VehicleType.Monorail)) {
+                    monoTracks.Add(lane);
+                }
+            }
+
+            if (trainTracks.Count > 2 || tramTracks.Count > 2 || MetroTracks.Count > 2 || monoTracks.Count > 2)
+                return true;
+
+            if (tramTracks.Count == 2) {
+                var dist = Mathf.Abs(tramTracks[0].m_position - tramTracks[1].m_position);
+                if (dist > 6.3f) return true;
+            }
+
+            if (trainTracks.Count == 2) {
+                var dist = Mathf.Abs(trainTracks[0].m_position - trainTracks[1].m_position);
+                if (!EqualAprox(dist, 4f)) return true;
+            }
+            if (MetroTracks.Count == 2) {
+                var dist = Mathf.Abs(MetroTracks[0].m_position - MetroTracks[1].m_position);
+                if (!EqualAprox(dist, 4f)) return true;
+            }
+            if (monoTracks.Count == 2) {
+                var dist = Mathf.Abs(monoTracks[0].m_position - monoTracks[1].m_position);
+                if (!EqualAprox(dist, 3f)) return true;
+            }
+
+            return false;
+        }
+
         // must be called before FixMaxTurnAngles()
         public static void LoadDCTextures() {
             AddedNodes = new List<NetInfo.Node>(100);
@@ -57,6 +104,8 @@ namespace DirectConnectRoads.Util {
                 if (info == null || info.m_nodes.Length == 0)
                     continue;
                 if (HasDCMedian(info))
+                    continue;
+                if (UnsupportedRoadWithTrack(info))
                     continue;
                 //if (info.name != "1847143370.Medium Four Lane Road_Data")
                 //    continue; // TODO DELETE

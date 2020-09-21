@@ -117,8 +117,6 @@
     <Compile Include="LifeCycle\LifeCycle.cs" />
     <Compile Include="LifeCycle\LoadingExtension.cs" />
     <Compile Include="LifeCycle\Mod.cs" />
-    <Compile Include="Math\MathUtil.cs" />
-    <Compile Include="Math\VecetorUtils.cs" />
     <Compile Include="Util\NodeInfoUtils.cs" />
     <Compile Include="KianCommons\KianCommons\Util\MeshUtil.cs" />
     <Compile Include="KianCommons\KianCommons\ObjUnity3D\Extensions\MeshExt.cs" />
