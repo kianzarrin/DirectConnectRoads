@@ -306,7 +306,8 @@ namespace DirectConnectRoads.Util {
                     Assertion.AssertNotNull(nodeInfo, "item");
                     var value = OriginalForbiddenFalgs[nodeInfo];
                     Assertion.Assert(value.GetType() == typeof(NetNode.Flags), $"{value}.type:{value.GetType()}==typeof(NetNode.Flags)");
-                    var flags = (NetNode.Flags)OriginalForbiddenFalgs[nodeInfo];
+                    Log.Debug($"{value}.type:{value.GetType()}");
+                    var flags = (NetNode.Flags)value;
                     nodeInfo.m_flagsForbidden = flags;
                 } catch (Exception e) {
                     Log.Error(e.Message);
