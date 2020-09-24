@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace DirectConnectRoads.Util {
     public static class RoadMeshUtil {
-        public const float ASPHALT_HEIGHT = -.3f;
+        //public const float ASPHALT_HEIGHT = -.3f;
 
         static bool EqualApprox(float a, float b) {
             var diff = a - b;
@@ -44,13 +44,13 @@ namespace DirectConnectRoads.Util {
 
 
         // TODO check if road is straight
-        public static List<float> GetAsphaltEdges(this Mesh mesh) {
+        public static List<float> GetAsphaltEdges(this Mesh mesh, float voffset/* = ASPHALT_HEIGHT*/) {
             List<float> ret = new List<float>();
             var crossSection = mesh.CrossSection().ToArray();
 
             bool prevIsMedian = true;
             foreach( var v in crossSection) { 
-                if (!EqualApprox(v.y, ASPHALT_HEIGHT))
+                if (!EqualApprox(v.y, voffset))
                     continue;
                 if (!prevIsMedian) // if both points are at road level then it does not form an edge.
                     continue;
@@ -64,14 +64,14 @@ namespace DirectConnectRoads.Util {
         public static bool IsBetween(float val, float lower, float upper, float e = 1e-6f)
             => lower - e < val && val < upper + e;
 
-        public static bool Selector(Vector3 vertex, float lower, float upper, bool asphalt) {
-            if (asphalt && !EqualApprox(vertex.y, ASPHALT_HEIGHT))
+        public static bool Selector(Vector3 vertex, float lower, float upper, bool asphalt, float voffset/* = ASPHALT_HEIGHT*/) {
+            if (asphalt && !EqualApprox(vertex.y, voffset))
                 return false;
             return IsBetween(vertex.x, lower, upper);
         }
 
-        public static List<Mesh> GenerateSections(this Mesh mesh, out List<float> edges) {
-            edges = mesh.GetAsphaltEdges();
+        public static List<Mesh> GenerateSections(this Mesh mesh, out List<float> edges, float voffset) {
+            edges = mesh.GetAsphaltEdges(voffset);
             int n = edges.Count - 1;
             var ret = new List<Mesh>(n);
             bool median = false;
@@ -79,7 +79,7 @@ namespace DirectConnectRoads.Util {
             for(int i = 0; i < n; ++i) {
                 float left = edges[i];
                 float right = edges[i + 1];
-                bool IsGoodFunc(Vector3 vertex) => Selector(vertex, left, right, asphalt:!median);
+                bool IsGoodFunc(Vector3 vertex) => Selector(vertex, left, right, asphalt:!median, voffset: voffset);
                 var section = mesh.CutMeshGeneric2(IsGoodFunc);
                 ret.Add(section);
             }
@@ -87,7 +87,7 @@ namespace DirectConnectRoads.Util {
         }
 
 
-        public static bool GetRoadSides(this Mesh mesh, out float left, out float right) {
+        public static bool GetRoadSides(this Mesh mesh, out float left, out float right, float voffset/* = ASPHALT_HEIGHT*/) {
             left = right = float.NaN;
 
             var crossSection = mesh.CrossSection().ToArray();
@@ -95,7 +95,7 @@ namespace DirectConnectRoads.Util {
 
             for (int i = 1; i <= crossSection.Length / 2; ++i) {
                 //Log.Debug("assesing vertex " + crossSection[i].ToString("e"),false);
-                if (EqualApprox(crossSection[i].y, ASPHALT_HEIGHT)) {
+                if (EqualApprox(crossSection[i].y, voffset)) {
                     left = crossSection[i].x;
                     break;
                 }
@@ -103,7 +103,7 @@ namespace DirectConnectRoads.Util {
 
             crossSection = crossSection.Reverse().ToArray();
             for (int i = 1; i <= crossSection.Length / 2; ++i) {
-                if (EqualApprox(crossSection[i].y, ASPHALT_HEIGHT)) {
+                if (EqualApprox(crossSection[i].y, voffset)) {
                     right = crossSection[i].x;
                     break;
                 }
@@ -115,13 +115,13 @@ namespace DirectConnectRoads.Util {
         /// <summary>
         /// returns a new mesh without the road sides.
         /// </summary>
-        public static Mesh CutOutRoadSides(this Mesh mesh) {
-            if (!mesh.GetRoadSides(out float left, out float right))
+        public static Mesh CutOutRoadSides(this Mesh mesh, float voffset/* = ASPHALT_HEIGHT*/) {
+            if (!mesh.GetRoadSides(out float left, out float right, voffset))
                 return null;
             bool IsGoodFunc(Vector3 vertex) {
                 float x = vertex.x;
                 if (EqualApprox(x, left) || EqualApprox(x, right))
-                    return EqualApprox(vertex.y, ASPHALT_HEIGHT);
+                    return EqualApprox(vertex.y, voffset);
                 return left < vertex.x && vertex.x < right;
             }
             return mesh.CutMeshGeneric2(IsGoodFunc);

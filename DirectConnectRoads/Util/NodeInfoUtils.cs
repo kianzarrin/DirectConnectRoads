@@ -26,23 +26,26 @@ namespace DirectConnectRoads {
             return segmentInfo.CheckFlags(NetSegment.Flags.None, out _);
         }
 
-        public static IEnumerable<NetInfo.Node> CreateDCNodes(NetInfo.Node template, NetInfo netInfo) {
+        public static IEnumerable<NetInfo.Node> CreateDCNodes(NetInfo.Node template, NetInfo netInfo, float voffset/* = NetInfoUtil.ASPHALT_HEIGHT*/) {
             Assertion.AssertNotNull(netInfo, "netInfo");
-            Log.Debug("CreateDCNode called for " + netInfo.name, false);
+            Log.Debug($"CreateDCNode({netInfo},{voffset}) called", false);
             var ret = new List<NetInfo.Node>();
             for (int i = 0; i < netInfo.m_segments.Length; ++i) {
                 var segmentInfo = netInfo.m_segments[i];
                 if (!IsSegmentInfoSuitable(segmentInfo)) {
-                    //Log.Debug($"Skiping segment[{i}]",false);
+                    Log.Debug($"Skiping segment[{i}]",false);
                     continue;
                 }
-                //Log.Debug($"processing segment[{i}]", false);
+                Log.Debug($"processing segment[{i}]", false);
                 var material = new Material(segmentInfo.m_material);
                 var mesh = segmentInfo.m_mesh;
                 //Log.Debug("[1] mesh=" + mesh?.name ?? "null", false);
-                mesh = mesh?.CutOutRoadSides();
+                mesh = mesh?.CutOutRoadSides(voffset);
                 mesh?.Elevate();
-                if (mesh == null || material == null) continue;
+                if (mesh == null || material == null) {
+                    Log.Debug("CreateDCNode failed for " + netInfo.name, false);
+                    continue;
+                }
 
                 mesh.name += "_DC";
                 material.name += "_DC";
@@ -65,7 +68,7 @@ namespace DirectConnectRoads {
                 node.m_connectGroup = NetInfo.ConnectGroup.DoubleTrain;
                 node.m_emptyTransparent = true;
 
-                Log.Debug("CreateDCNode sucessful for " + netInfo?.name, false);
+                Log.Debug("CreateDCNode sucessful for " + netInfo.name, false);
                 node.m_nodeMesh.DumpMesh($"DC mesh for {netInfo.name}");
                 ret.Add(node);
             }

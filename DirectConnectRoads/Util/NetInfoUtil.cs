@@ -7,9 +7,12 @@ using KianCommons;
 using UnityEngine;
 using ColossalFramework;
 using static KianCommons.Math.MathUtil;
+using TrafficManager.Manager.Impl;
 
 namespace DirectConnectRoads.Util {
     public static class NetInfoUtil {
+        //public const float ASPHALT_HEIGHT = RoadMeshUtil.ASPHALT_HEIGHT;
+
         #region Textures
         public static NetInfo GetInfo(string name) {
             int count = PrefabCollection<NetInfo>.LoadedCount();
@@ -51,8 +54,6 @@ namespace DirectConnectRoads.Util {
             return false;
         }
 
-
-
         public static HashSet<NetInfo> UnsupportedRoadWithTrackTable = new HashSet<NetInfo>();
 
         /// <summary>
@@ -60,7 +61,7 @@ namespace DirectConnectRoads.Util {
         /// or if tracks are too far apart.
         /// </summary>
         public static bool UnsupportedRoadWithTrack(NetInfo info) {
-            Log.Debug($"UnsupportedRoadWithTrack({info.name} called", false);
+            //Log.Debug($"UnsupportedRoadWithTrack({info.name}) called", false);
             var trainTracks = new List<NetInfo.Lane>();
             var tramTracks = new List<NetInfo.Lane>();
             var MetroTracks = new List<NetInfo.Lane>();
@@ -114,17 +115,48 @@ namespace DirectConnectRoads.Util {
                     UnsupportedRoadWithTrackTable.Add(info);
                     continue;
                 }
-                if (HasDCMedian(info))
+                if (HasDCMedian(info)) {
+                    Log.Debug($"Skipping {info} because it already has median", false);
                     continue;
+                }
+
+                if(!GetAshphaltOffset(info, out float voffset)) {
+                    if(float.IsNaN(voffset))
+                        Log.Debug($"Skipping {info} because it has no car lanes. voffset={voffset}", false);
+                    else
+                        Log.Debug($"Skipping {info} because it has lanes at different vertical offset. voffset={voffset}", false);
+                    continue;
+                }
+                    
                 //if (info.name != "1847143370.Medium Four Lane Road_Data")
                 //    continue; // TODO DELETE
-                AddDCTextures(info);
+                AddDCTextures(info, voffset);
             } // end for
         }
 
-        public static void AddDCTextures(NetInfo netInfo) {
+        /// <summary>
+        /// returns true if all car lans have the same level. offset==nan
+        /// returns false if car lanes have different vertical offsets or no car lane was found. offset==offset of some lane.
+        /// </summary>
+        /// <param name="offset">vertical offset of the car the car lanes.</param>
+        public static bool GetAshphaltOffset(this NetInfo info, out float offset) {
+            offset = float.NaN;
+            foreach (var lane in info.m_lanes) {
+                bool isCarLane = lane.m_vehicleType.IsFlagSet(LaneArrowManager.VEHICLE_TYPES) &&
+                                 lane.m_laneType.IsFlagSet(LaneArrowManager.LANE_TYPES);
+                if (!isCarLane)
+                    continue;
+                if (float.IsNaN(offset))
+                    offset = lane.m_verticalOffset;
+                else if (offset != lane.m_verticalOffset)
+                    return false;
+            }
+            return !float.IsNaN(offset);
+        }
+
+        public static void AddDCTextures(NetInfo netInfo, float voffset/* = ASPHALT_HEIGHT*/) {
             try {
-                var nodes = NodeInfoUtil.CreateDCNodes(netInfo.m_nodes[0], netInfo);
+                var nodes = NodeInfoUtil.CreateDCNodes(netInfo.m_nodes[0], netInfo, voffset);
                 if (nodes == null) return;
                 foreach (var node in nodes) {
                     netInfo.m_nodes = NodeInfoUtil.AddNode(netInfo.m_nodes, node);
@@ -272,6 +304,8 @@ namespace DirectConnectRoads.Util {
             foreach (NetInfo.Node nodeInfo in OriginalForbiddenFalgs.Keys) {
                 try {
                     Assertion.AssertNotNull(nodeInfo, "item");
+                    var value = OriginalForbiddenFalgs[nodeInfo];
+                    Assertion.Assert(value.GetType() == typeof(NetNode.Flags), $"{value}.type:{value.GetType()}==typeof(NetNode.Flags)");
                     var flags = (NetNode.Flags)OriginalForbiddenFalgs[nodeInfo];
                     nodeInfo.m_flagsForbidden = flags;
                 } catch (Exception e) {
