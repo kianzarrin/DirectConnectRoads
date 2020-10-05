@@ -65,7 +65,7 @@ namespace DirectConnectRoads {
                 node.m_mesh = node.m_nodeMesh = mesh;
                 node.m_material = node.m_nodeMaterial = material;
                 node.m_directConnect = true;
-                node.m_connectGroup = NetInfo.ConnectGroup.DoubleTrain;
+                node.m_connectGroup = NetInfo.ConnectGroup.TrainStation;
                 node.m_emptyTransparent = true;
 
                 Log.Debug("CreateDCNode sucessful for " + netInfo.name, false);

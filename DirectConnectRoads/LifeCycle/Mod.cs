@@ -16,17 +16,15 @@ namespace DirectConnectRoads.LifeCycle
         [UsedImplicitly]
         public void OnEnabled()
         {
-            HarmonyHelper.EnsureHarmonyInstalled();   
-            if (HelpersExtensions.InGame)
-                LifeCycle.Load();
+            LifeCycle.Enable();
             IsEnabled = true;
         }
 
         [UsedImplicitly]
         public void OnDisabled()
         {
+            LifeCycle.Disable();
             IsEnabled = false;
-            LifeCycle.Unload();
         }
     }
 }

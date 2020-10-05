@@ -110,6 +110,11 @@ namespace DirectConnectRoads.Util {
             foreach (NetInfo info in IterateRoadPrefabs()) {
                 if (info == null || info.m_nodes.Length == 0)
                     continue;
+                if (!info.m_hasPedestrianLanes) {
+                    Log.Debug($"Skipping {info} because it has no pedestrian lanes", false);
+                    continue;
+                }
+
                 if (UnsupportedRoadWithTrack(info)) {
                     Log.Debug($"UnsupportedRoadWithTrackTable.Add({info})",false);
                     UnsupportedRoadWithTrackTable.Add(info);
@@ -289,7 +294,7 @@ namespace DirectConnectRoads.Util {
 
                         var flags = nodeInfo.m_flagsForbidden & ~(NetNode.Flags.Transition | NetNode.Flags.TrafficLights);
                         if(nodeInfo.m_flagsForbidden != flags) {
-                            OriginalForbiddenFalgs[netInfo] = nodeInfo.m_flagsForbidden;
+                            OriginalForbiddenFalgs[nodeInfo] = nodeInfo.m_flagsForbidden;
                             nodeInfo.m_flagsForbidden = flags;
                         }
                     }
@@ -301,12 +306,14 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void RestoreFlags() {
-            foreach (NetInfo.Node nodeInfo in OriginalForbiddenFalgs.Keys) {
+            foreach (var key in OriginalForbiddenFalgs.Keys) {
                 try {
+                    Assertion.AssertNotNull(key is NetInfo.Node, "key is NetInfo.Node");
+                    Assertion.Assert(key is NetInfo.Node, "key is NetInfo.Node");
+                    NetInfo.Node nodeInfo = key as NetInfo.Node;
                     Assertion.AssertNotNull(nodeInfo, "item");
                     var value = OriginalForbiddenFalgs[nodeInfo];
                     Assertion.Assert(value.GetType() == typeof(NetNode.Flags), $"{value}.type:{value.GetType()}==typeof(NetNode.Flags)");
-                    Log.Debug($"{value}.type:{value.GetType()}");
                     var flags = (NetNode.Flags)value;
                     nodeInfo.m_flagsForbidden = flags;
                 } catch (Exception e) {
