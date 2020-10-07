@@ -21,6 +21,8 @@ namespace DirectConnectRoads {
             if (segmentInfo == null) return false;
             if (!segmentInfo.m_mesh || !segmentInfo.m_material)
                 return false;
+                if (segmentInfo.m_material.name.Contains("NetworkTiling"))
+                    return false;
             if (!segmentInfo.m_material.TryGetTexture2D(TextureUtils.ID_Defuse))
                 return false;
             return segmentInfo.CheckFlags(NetSegment.Flags.None, out _);
