@@ -3,6 +3,7 @@ using KianCommons;
 using DirectConnectRoads.Util;
 using CitiesHarmony.API;
 using ColossalFramework;
+using ICities;
 
 namespace DirectConnectRoads.LifeCycle {
     public static class LifeCycle {
@@ -58,8 +59,22 @@ namespace DirectConnectRoads.LifeCycle {
                 NetInfoUtil.FixMaxTurnAngles();
                 NetInfoUtil.FixDCFlags();
             }
-            NetInfoUtil.UpdateAllNodes();
+
+            // TODO: which line to uncomment:
+            // NetInfoUtil.UpdateAllNetworkRenderers();
+            // NetInfoUtil.FastUpdateAllNetworks();
+            // NetInfoUtil.FullUpdateAllNetworks();
+
             Loaded = true;
+        }
+
+        public static void AfterLoad() {
+            SimulationManager.instance.AddAction(delegate () {
+                // TODO: which line to uncomment:
+                // NetInfoUtil.UpdateAllNetworkRenderers();
+                // NetInfoUtil.FastUpdateAllNetworks();
+                // NetInfoUtil.FullUpdateAllNetworks();
+            });
         }
 
         public static void ExitToMainMenu() {

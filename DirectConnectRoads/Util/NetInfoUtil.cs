@@ -12,6 +12,7 @@ using TrafficManager.Manager.Impl;
 namespace DirectConnectRoads.Util {
     public static class NetInfoUtil {
         //public const float ASPHALT_HEIGHT = RoadMeshUtil.ASPHALT_HEIGHT;
+        [Obsolete]
         public static void UpdateAllNodes() {
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
@@ -21,7 +22,7 @@ namespace DirectConnectRoads.Util {
             }
         }
 
-        public static void UpdateAllNetworkRenderer() {
+        public static void UpdateAllNetworkRenderers() {
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
@@ -31,6 +32,34 @@ namespace DirectConnectRoads.Util {
                 }
             }
         }
+
+        public static void FastUpdateAllNetworks() {
+            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
+                if (!NetUtil.IsNodeValid(nodeID)) continue;
+                if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
+
+                nodeID.ToNode().UpdateNode(nodeID);
+                NetManager.instance.UpdateNodeFlags(nodeID);
+                NetManager.instance.UpdateNodeRenderer(nodeID, true);
+
+                foreach (ushort segmentID in NetUtil.IterateNodeSegments(nodeID)) {
+                    segmentID.ToSegment().UpdateSegment(segmentID);
+                    NetManager.instance.UpdateSegmentFlags(segmentID);
+                    NetManager.instance.UpdateSegmentRenderer(segmentID, true);
+
+                }
+            }
+        }
+
+        public static void FullUpdateAllNetworks() {
+            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
+                if (!NetUtil.IsNodeValid(nodeID)) continue;
+                if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
+                NetManager.instance.UpdateNode(nodeID);
+            }
+        }
+
+
 
         #region Textures
         public static NetInfo GetInfo(string name) {

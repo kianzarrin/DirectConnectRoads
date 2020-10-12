@@ -1,4 +1,1 @@
-update all segments.
-if not RoadBaseAI fall back to default.
-exclude asym
-better compatiblity check
+update all segments. ...

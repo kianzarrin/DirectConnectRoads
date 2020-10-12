@@ -115,6 +115,7 @@
     <Compile Include="KianCommons\KianCommons\Util\Log.cs" />
     <Compile Include="KianCommons\KianCommons\Util\NetUtil.cs" />
     <Compile Include="LifeCycle\LifeCycle.cs" />
+    <Compile Include="LifeCycle\LoadingExtension.cs" />
     <Compile Include="LifeCycle\Mod.cs" />
     <Compile Include="Util\NodeInfoUtils.cs" />
     <Compile Include="KianCommons\KianCommons\Util\MeshUtil.cs" />

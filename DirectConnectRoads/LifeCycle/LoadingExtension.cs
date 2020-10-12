@@ -8,12 +8,12 @@ namespace DirectConnectRoads.LifeCycle
         public override void OnLevelLoaded(LoadMode mode)
         {
             Log.Debug("LoadingExtention.OnLevelLoaded");
-            LifeCycle.OnLevelLoaded(mode);
+            LifeCycle.AfterLoad();
         }
 
-        public override void OnLevelUnloading()
-        {
-            LifeCycle.OnLevelUnloading();
-        }
+        //public override void OnLevelUnloading()
+        //{
+        //    LifeCycle.OnLevelUnloading();
+        //}
     }
 }
