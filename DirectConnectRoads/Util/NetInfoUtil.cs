@@ -12,6 +12,14 @@ using TrafficManager.Manager.Impl;
 namespace DirectConnectRoads.Util {
     public static class NetInfoUtil {
         //public const float ASPHALT_HEIGHT = RoadMeshUtil.ASPHALT_HEIGHT;
+        public static void UpdateAllNodes() {
+            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
+                if (!NetUtil.IsNodeValid(nodeID)) continue;
+                if (!nodeID.ToNode().Info.m_requireDirectRenderers) continue;
+                if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
+                NetManager.instance.UpdateNodeRenderer(nodeID, true);
+            }
+        }
 
         #region Textures
         public static NetInfo GetInfo(string name) {

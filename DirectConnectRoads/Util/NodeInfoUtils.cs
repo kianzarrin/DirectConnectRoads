@@ -16,7 +16,6 @@ namespace DirectConnectRoads {
             return node;
         }
 
-
         static bool IsSegmentInfoSuitable(NetInfo.Segment segmentInfo) {
             if (segmentInfo == null) return false;
             if (!segmentInfo.m_mesh || !segmentInfo.m_material)
@@ -68,7 +67,11 @@ namespace DirectConnectRoads {
                 node.m_material = node.m_nodeMaterial = material;
                 node.m_directConnect = true;
                 node.m_connectGroup = NetInfo.ConnectGroup.TrainStation;
-                node.m_emptyTransparent = true;
+                //node.m_emptyTransparent = true; // is this causing blue textures?
+
+                node.m_lodMaterial = null;
+                node.m_lodMesh = null;
+                node.m_combinedLod = null;
 
                 Log.Debug("CreateDCNode sucessful for " + netInfo.name, false);
                 node.m_nodeMesh.DumpMesh($"DC mesh for {netInfo.name}");

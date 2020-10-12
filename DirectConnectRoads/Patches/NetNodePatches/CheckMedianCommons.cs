@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using KianCommons;
+using ColossalFramework;
 
 namespace DirectConnectRoads.Patches {
     using DirectConnectRoads.Util;
@@ -21,14 +22,24 @@ namespace DirectConnectRoads.Patches {
             ushort targetSegmentID = nodeId.ToNode().GetSegment(targetSegmentIDX);
             NetInfo info = sourceSegmentID.ToSegment().Info;
             NetInfo.Node nodeInfo = info.m_nodes[nodeInfoIDX];
-            if (NetInfoUtil.UnsupportedRoadWithTrackTable.Contains(info)) {
-                return true; // ignore
-            }
             if (!DirectConnectUtil.IsMedian(nodeInfo, info)) {
                 //Log.Debug($"not a median: node:{nodeId} connect_group:{nodeInfo.m_connectGroup} " +
                 //    $"vehcileTypes:{info.m_vehicleTypes}",false);
                 return true; // ignore.
             }
+            if (NetInfoUtil.UnsupportedRoadWithTrackTable.Contains(info)) {
+                return true; // ignore
+            }
+
+            if (nodeId.ToNode().m_flags.IsFlagSet(NetNode.Flags.OneWayIn | NetNode.Flags.OneWayOut)) {
+                return false;
+            }
+            NetInfo sourceInfo = sourceSegmentID.ToSegment().Info;
+            NetInfo targetInfo = targetSegmentID.ToSegment().Info;
+            if (!sourceInfo.IsCombatible(targetInfo)) {
+                return false; // ignore
+            }
+
             return !DirectConnectUtil.OpenMedian(sourceSegmentID, targetSegmentID);
                 //.LogRet($"ShouldConnectMedian(sourceSegmentID={sourceSegmentID}, targetSegmentID={targetSegmentID})->");
         }
@@ -85,8 +96,5 @@ namespace DirectConnectRoads.Patches {
             Assertion.Assert(IsLdLoc(code), $"IsLdLoc(code) | code={code}");
             return code;
         }
-
-
-
     }
 }

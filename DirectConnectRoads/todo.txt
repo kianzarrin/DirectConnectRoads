@@ -1,0 +1,4 @@
+exclude onewayin onewayout (done untested)
+exclude source segment does not match target. (done untested)
+exclude lod. (done untested)
+update all nodes (done untested)
