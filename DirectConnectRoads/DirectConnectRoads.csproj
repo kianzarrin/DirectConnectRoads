@@ -71,14 +71,6 @@
     <Reference Include="TMPE.API">
       <HintPath>..\libs\TMPE.API.dll</HintPath>
     </Reference>
-    <Reference Include="TMPE.CitiesGameBridge">
-      <HintPath>..\libs\TMPE.CitiesGameBridge.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="TMPE.GenericGameBridge">
-      <HintPath>..\libs\TMPE.GenericGameBridge.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(MangedDLLPath)\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -89,10 +81,6 @@
     </Reference>
     <Reference Include="TrafficManager">
       <HintPath>..\libs\TrafficManager.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NetworkSkins">
-      <HintPath>..\libs\NetworkSkins.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
