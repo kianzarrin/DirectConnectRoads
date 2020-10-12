@@ -6,6 +6,8 @@ namespace DirectConnectRoads.LifeCycle
     using CitiesHarmony.API;
     using KianCommons;
     using Util;
+    using ColossalFramework.UI;
+
     public class Mod : IUserMod
     {
         public static Version ModVersion => typeof(Mod).Assembly.GetName().Version;
@@ -29,15 +31,9 @@ namespace DirectConnectRoads.LifeCycle
         }
 
         public void OnSettingsUI(UIHelperBase helper) {
-            if (HelpersExtensions.InGameOrEditor) {
-                helper.AddButton("update all network renderers", () =>
-                SimulationManager.instance.AddAction(NetInfoUtil.UpdateAllNetworkRenderers));
-                helper.AddButton("fast update all networks", () =>
-                SimulationManager.instance.AddAction(NetInfoUtil.FastUpdateAllNetworks));
-                helper.AddButton("full update all networks", () =>
-                SimulationManager.instance.AddAction(NetInfoUtil.FullUpdateAllNetworks));
-            }
-
+            UIButton button = helper.AddButton("Refresh all junctions (Resolve blue clippings)", RefreshNetworks) as UIButton;
+            void RefreshNetworks() => SimulationManager.instance.AddAction(NetInfoUtil.FullUpdateAllNetworks);
+            button.tooltip = "might take a while";
         }
     }
 }

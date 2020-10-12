@@ -63,7 +63,7 @@ namespace DirectConnectRoads.LifeCycle {
             // TODO: which line to uncomment:
             // NetInfoUtil.UpdateAllNetworkRenderers();
             // NetInfoUtil.FastUpdateAllNetworks();
-            // NetInfoUtil.FullUpdateAllNetworks();
+            NetInfoUtil.FullUpdateAllNetworks();
 
             Loaded = true;
         }
