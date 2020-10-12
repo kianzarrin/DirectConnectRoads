@@ -14,6 +14,7 @@ namespace DirectConnectRoads.Util {
         //public const float ASPHALT_HEIGHT = RoadMeshUtil.ASPHALT_HEIGHT;
         [Obsolete]
         public static void UpdateAllNodes() {
+            Log.Info("UpdateAllNodes() called ...",true);
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().Info.m_requireDirectRenderers) continue;
@@ -23,6 +24,7 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void UpdateAllNetworkRenderers() {
+            Log.Info("UpdateAllNetworkRenderers() called ...",true);
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
@@ -34,6 +36,7 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void FastUpdateAllNetworks() {
+            Log.Info("FastUpdateAllNetworks() called ...", true);
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
@@ -52,9 +55,11 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void FullUpdateAllNetworks() {
+            Log.Info("FullUpdateAllNetworks() called ...", true);
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
+                //Log.Debug("updating node:"+ nodeID);
                 NetManager.instance.UpdateNode(nodeID);
             }
         }
