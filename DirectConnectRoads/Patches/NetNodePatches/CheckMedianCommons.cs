@@ -22,6 +22,8 @@ namespace DirectConnectRoads.Patches {
             ushort targetSegmentID = nodeId.ToNode().GetSegment(targetSegmentIDX);
             NetInfo info = sourceSegmentID.ToSegment().Info;
             NetInfo.Node nodeInfo = info.m_nodes[nodeInfoIDX];
+            if (!info.IsRoad())
+                return true; // ignore
             if (!DirectConnectUtil.IsMedian(nodeInfo, info)) {
                 //Log.Debug($"not a median: node:{nodeId} connect_group:{nodeInfo.m_connectGroup} " +
                 //    $"vehcileTypes:{info.m_vehicleTypes}",false);
@@ -30,19 +32,27 @@ namespace DirectConnectRoads.Patches {
             if (NetInfoUtil.UnsupportedRoadWithTrackTable.Contains(info)) {
                 return true; // ignore
             }
+            if (!info.IsNormalSymetricalTwoWay())
+                return true; //ignore
 
-            if (nodeId.ToNode().m_flags.IsFlagSet(NetNode.Flags.OneWayIn | NetNode.Flags.OneWayOut)) {
-                return false;
-            }
             NetInfo sourceInfo = sourceSegmentID.ToSegment().Info;
             NetInfo targetInfo = targetSegmentID.ToSegment().Info;
-            if (!sourceInfo.IsCombatible(targetInfo)) {
+            if (!Connects(sourceInfo, targetInfo)) {
                 return false; // ignore
             }
 
             return !DirectConnectUtil.OpenMedian(sourceSegmentID, targetSegmentID);
                 //.LogRet($"ShouldConnectMedian(sourceSegmentID={sourceSegmentID}, targetSegmentID={targetSegmentID})->");
         }
+
+        public static bool Connects(NetInfo source, NetInfo target) {
+            if (!source.IsCombatible(target))
+                return false;
+            if ( (source.m_vehicleTypes ^ target.m_vehicleTypes)  != VehicleInfo.VehicleType.None) 
+                return false;
+            return true;
+        }
+
 
         static MethodInfo mShouldConnectMedian => typeof(CheckMedianCommons).GetMethod("ShouldConnectMedian");
         static MethodInfo mCheckRenderDistance => typeof(RenderManager.CameraInfo).GetMethod("CheckRenderDistance");

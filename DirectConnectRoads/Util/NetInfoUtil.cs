@@ -21,6 +21,17 @@ namespace DirectConnectRoads.Util {
             }
         }
 
+        public static void UpdateAllNetworkRenderer() {
+            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
+                if (!NetUtil.IsNodeValid(nodeID)) continue;
+                if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
+                NetManager.instance.UpdateNodeRenderer(nodeID, true);
+                foreach(ushort segmentID in NetUtil.IterateNodeSegments(nodeID)) {
+                    NetManager.instance.UpdateSegmentRenderer(segmentID, true);
+                }
+            }
+        }
+
         #region Textures
         public static NetInfo GetInfo(string name) {
             int count = PrefabCollection<NetInfo>.LoadedCount();
@@ -111,6 +122,42 @@ namespace DirectConnectRoads.Util {
             return false;
         }
 
+
+        public static bool IsRoad(this NetInfo info) => info.m_netAI is RoadBaseAI;
+
+        public static bool IsNormalSymetricalTwoWay(this NetInfo info) {
+            bool ret = info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount && info.m_hasBackwardVehicleLanes;
+            if (!ret)
+                return false;
+
+            int forwardbikeLanes = 0;
+            int backwardbikeLanes = 0;
+            int parkingLanes = 0;
+            int pedestrianLanes = 0;
+            foreach (var lane in info.m_lanes) {
+                if (lane.m_laneType == NetInfo.LaneType.Pedestrian) {
+                    pedestrianLanes++;
+                } else if (lane.m_laneType == NetInfo.LaneType.Parking) {
+                    parkingLanes++;
+                } else if (lane.m_vehicleType.IsFlagSet(VehicleInfo.VehicleType.Bicycle)) {
+                    if (lane.m_direction == NetInfo.Direction.Forward)
+                        forwardbikeLanes++;
+                    if (lane.m_direction == NetInfo.Direction.Backward)
+                        backwardbikeLanes++;
+                    else
+                        return false;
+                }
+            }
+            if (forwardbikeLanes != backwardbikeLanes)
+                return false;
+            if (parkingLanes != 2 && parkingLanes != 0)
+                return false;
+            if (pedestrianLanes != 2 && pedestrianLanes != 0)
+                return false;
+            return true;
+        }
+
+
         // must be called before FixMaxTurnAngles()
         public static void LoadDCTextures() {
             AddedNodes = new List<NetInfo.Node>(100);
@@ -118,6 +165,13 @@ namespace DirectConnectRoads.Util {
             foreach (NetInfo info in IterateRoadPrefabs()) {
                 if (info == null || info.m_nodes.Length == 0)
                     continue;
+                if (!info.IsRoad())
+                    continue;
+                if (!info.IsNormalSymetricalTwoWay()) {
+                    Log.Debug($"Skipping {info} because it is !IsNormalSymetricalTwoWay()", false);
+                    continue;
+                }
+
                 if (!info.m_hasPedestrianLanes) {
                     Log.Debug($"Skipping {info} because it has no pedestrian lanes", false);
                     continue;
