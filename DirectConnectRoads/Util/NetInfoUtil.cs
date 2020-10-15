@@ -8,6 +8,7 @@ using UnityEngine;
 using ColossalFramework;
 using static KianCommons.Math.MathUtil;
 using TrafficManager.Manager.Impl;
+using DirectConnectRoads.Util;
 
 namespace DirectConnectRoads.Util {
     public static class NetInfoUtil {
@@ -230,13 +231,11 @@ namespace DirectConnectRoads.Util {
                     continue;
                 }
 
-                if (!API.InvokeShouldCreateDCNodes(info)) {
-                    Log.Debug($"Skipping {info} because it an external subscriber to ShouldCreateDCNodes returned false", false);
+                if (!info.IsAdaptive()) {
+                    Log.Debug($"Skipping {info} because it belongs to the adaptive roads mod", false);
                     continue;
                 }
 
-                //if (info.name != "1847143370.Medium Four Lane Road_Data")
-                //    continue; // TODO DELETE
                 AddDCTextures(info, voffset);
             } // end for
         }

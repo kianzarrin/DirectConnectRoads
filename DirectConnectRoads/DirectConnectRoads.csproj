@@ -102,9 +102,11 @@
     <Compile Include="KianCommons\KianCommons\Util\HelpersExtensions.cs" />
     <Compile Include="KianCommons\KianCommons\Util\Log.cs" />
     <Compile Include="KianCommons\KianCommons\Util\NetUtil.cs" />
+    <Compile Include="KianCommons\KianCommons\Util\PluginUtil.cs" />
     <Compile Include="LifeCycle\LifeCycle.cs" />
     <Compile Include="LifeCycle\LoadingExtension.cs" />
     <Compile Include="LifeCycle\Mod.cs" />
+    <Compile Include="Util\AdaptiveRoadsUtil.cs" />
     <Compile Include="Util\NodeInfoUtils.cs" />
     <Compile Include="KianCommons\KianCommons\Util\MeshUtil.cs" />
     <Compile Include="KianCommons\KianCommons\ObjUnity3D\Extensions\MeshExt.cs" />

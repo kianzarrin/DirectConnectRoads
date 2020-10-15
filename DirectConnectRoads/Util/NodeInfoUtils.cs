@@ -14,7 +14,6 @@ namespace DirectConnectRoads {
         public static NetInfo.Node Copy(NetInfo.Node template) {
             NetInfo.Node node = new NetInfo.Node();
             AssemblyTypeExtensions.CopyProperties<NetInfo.Node>(node, template);
-            API.InvokeOnNodeCloned(target: node, source: template);
             return node;
         }
 
