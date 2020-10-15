@@ -9,10 +9,12 @@ namespace DirectConnectRoads {
     public static class NodeInfoUtil{
         /// <summary>
         /// creates new clone of the node.
+        /// Patch this to control node cloning.
         /// </summary>
         public static NetInfo.Node Copy(NetInfo.Node template) {
             NetInfo.Node node = new NetInfo.Node();
             AssemblyTypeExtensions.CopyProperties<NetInfo.Node>(node, template);
+            API.InvokeOnNodeCloned(target: node, source: template);
             return node;
         }
 

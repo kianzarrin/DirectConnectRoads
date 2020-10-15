@@ -35,6 +35,9 @@ namespace DirectConnectRoads.Patches {
             if (!info.IsNormalSymetricalTwoWay())
                 return true; //ignore
 
+            if (!API.InvokeShouldManageDCNodes(info))
+                return true; // ignore
+
             NetInfo sourceInfo = sourceSegmentID.ToSegment().Info;
             NetInfo targetInfo = targetSegmentID.ToSegment().Info;
             if (!Connects(sourceInfo, targetInfo)) {

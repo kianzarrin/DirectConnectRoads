@@ -2,8 +2,6 @@ using DirectConnectRoads.Patches;
 using KianCommons;
 using DirectConnectRoads.Util;
 using CitiesHarmony.API;
-using ColossalFramework;
-using ICities;
 
 namespace DirectConnectRoads.LifeCycle {
     public static class LifeCycle {

@@ -192,6 +192,7 @@ namespace DirectConnectRoads.Util {
         }
 
 
+
         // must be called before FixMaxTurnAngles()
         public static void LoadDCTextures() {
             AddedNodes = new List<NetInfo.Node>(100);
@@ -228,7 +229,12 @@ namespace DirectConnectRoads.Util {
                         Log.Debug($"Skipping {info} because it has lanes at different vertical offset. voffset={voffset}", false);
                     continue;
                 }
-                    
+
+                if (!API.InvokeShouldCreateDCNodes(info)) {
+                    Log.Debug($"Skipping {info} because it an external subscriber to ShouldCreateDCNodes returned false", false);
+                    continue;
+                }
+
                 //if (info.name != "1847143370.Medium Four Lane Road_Data")
                 //    continue; // TODO DELETE
                 AddDCTextures(info, voffset);
