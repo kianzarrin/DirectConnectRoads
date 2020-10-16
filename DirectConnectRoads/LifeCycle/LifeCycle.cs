@@ -2,6 +2,7 @@ using DirectConnectRoads.Patches;
 using KianCommons;
 using DirectConnectRoads.Util;
 using CitiesHarmony.API;
+using System;
 
 namespace DirectConnectRoads.LifeCycle {
     public static class LifeCycle {
@@ -45,25 +46,35 @@ namespace DirectConnectRoads.LifeCycle {
 
         // first thing that happens when start game/editor from main menue or load another game.
         public static void PreLoad() {
-            Log.Debug("LifeCycle.PreLoad() called");
-            HarmonyUtil.InstallHarmony(HarmonyId); // if not installed already.
+            try {
+                Log.Debug("LifeCycle.PreLoad() called");
+                HarmonyUtil.InstallHarmony(HarmonyId); // if not installed already.
+                Log.Info("mIsActive:" + AdaptiveRoadsUtil.mIsAdaptive,true);
+            } catch (Exception e) {
+                Log.Exception(e);
+            }
         }
 
         public static void SimulationDataReady() {
-            Log.Debug("LifeCycle.SimulationDataReady() called");
-            if (!Loaded) {
-                CheckMedianCommons.Init();
-                NetInfoUtil.LoadDCTextures();
-                NetInfoUtil.FixMaxTurnAngles();
-                NetInfoUtil.FixDCFlags();
+            try {
+                Log.Debug("LifeCycle.SimulationDataReady() called");
+                if (!Loaded) {
+                    CheckMedianCommons.Init();
+                    NetInfoUtil.LoadDCTextures();
+                    NetInfoUtil.FixMaxTurnAngles();
+                    NetInfoUtil.FixDCFlags();
+                }
+
+                // TODO: which line to uncomment:
+                // NetInfoUtil.UpdateAllNetworkRenderers();
+                // NetInfoUtil.FastUpdateAllNetworks();
+                NetInfoUtil.FullUpdateAllNetworks();
+
+                Loaded = true;
             }
-
-            // TODO: which line to uncomment:
-            // NetInfoUtil.UpdateAllNetworkRenderers();
-            // NetInfoUtil.FastUpdateAllNetworks();
-            NetInfoUtil.FullUpdateAllNetworks();
-
-            Loaded = true;
+            catch (Exception e) {
+                Log.Exception(e);
+            }
         }
 
         public static void AfterLoad() {

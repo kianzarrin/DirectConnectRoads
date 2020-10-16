@@ -231,7 +231,7 @@ namespace DirectConnectRoads.Util {
                     continue;
                 }
 
-                if (!info.IsAdaptive()) {
+                if (info.IsAdaptive()) {
                     Log.Debug($"Skipping {info} because it belongs to the adaptive roads mod", false);
                     continue;
                 }
