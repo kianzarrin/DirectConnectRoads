@@ -12,6 +12,8 @@ namespace DirectConnectRoads {
         /* Inokations ***************************/
 
         internal static bool InvokeShouldManageDCNodes(NetInfo info) {
+            if (ShouldManageDCNodes == null)
+                return true;
             var arg = new object[] { info };
             foreach (var m in ShouldManageDCNodes.GetInvocationList()) {
                 bool ret = (bool)m.DynamicInvoke(arg);

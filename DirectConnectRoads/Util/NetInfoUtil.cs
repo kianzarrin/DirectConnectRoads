@@ -192,8 +192,6 @@ namespace DirectConnectRoads.Util {
             return true;
         }
 
-
-
         // must be called before FixMaxTurnAngles()
         public static void LoadDCTextures() {
             AddedNodes = new List<NetInfo.Node>(100);
