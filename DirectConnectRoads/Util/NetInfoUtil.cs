@@ -194,7 +194,7 @@ namespace DirectConnectRoads.Util {
 
         // must be called before FixMaxTurnAngles()
         public static void LoadDCTextures() {
-            AddedNodes = new List<NetInfo.Node>(100);
+            AddedNodes = new HashSet<NetInfo.Node>();
             Log.Info("LoadDCTextures() called");
             foreach (NetInfo info in IterateRoadPrefabs()) {
                 if (info == null || info.m_nodes.Length == 0)
@@ -275,7 +275,7 @@ namespace DirectConnectRoads.Util {
             }
         }
 
-        public static List<NetInfo.Node> AddedNodes;
+        public static HashSet<NetInfo.Node> AddedNodes;
 
         public static void UnloadDCTextures() {
             foreach (NetInfo info in IterateRoadPrefabs())
