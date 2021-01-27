@@ -49,8 +49,6 @@ namespace DirectConnectRoads.LifeCycle {
             try {
                 Log.Debug("LifeCycle.PreLoad() called");
                 HarmonyUtil.InstallHarmony(HarmonyId); // if not installed already.
-                if(AdaptiveRoadsUtil.IsActive)
-                    Log.Info("mIsAdaptive=" + AdaptiveRoadsUtil.mIsAdaptive, false);
             } catch (Exception e) {
                 Log.Exception(e);
             }

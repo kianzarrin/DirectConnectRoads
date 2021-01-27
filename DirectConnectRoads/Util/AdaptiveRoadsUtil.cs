@@ -11,7 +11,7 @@ namespace DirectConnectRoads.Util {
         public static Assembly asm => plugin.GetMainAssembly();
         public static bool IsActive => plugin.IsActive();
         public static MethodInfo mIsAdaptive =>
-            asm.GetType("AdaptiveRoads.Manager.NetInfoExt", throwOnError: true, ignoreCase: true)
+            asm.GetType("AdaptiveRoads.API", throwOnError: true, ignoreCase: true)
             .GetMethod("IsAdaptive") ?? throw new Exception("IsAdaptive not found");
 
         public static bool IsAdaptive(this NetInfo info) {
