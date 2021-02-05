@@ -13,7 +13,7 @@ namespace DirectConnectRoads {
         /// </summary>
         public static NetInfo.Node Copy(NetInfo.Node template) {
             NetInfo.Node node = new NetInfo.Node();
-            AssemblyTypeExtensions.CopyProperties<NetInfo.Node>(node, template);
+            ReflectionHelpers.CopyProperties<NetInfo.Node>(node, template);
             return node;
         }
 
