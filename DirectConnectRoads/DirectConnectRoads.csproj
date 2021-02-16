@@ -33,7 +33,9 @@
         <PackageReference Include="CitiesHarmony.API" Version="2.0.0" />
     </ItemGroup>
     <ItemGroup>
-    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.DataSetExtensions">
+      <Private>false</Private>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(ManagedDLLPath)\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
@@ -48,6 +50,7 @@
     </Reference>
     <Reference Include="TMPE.API">
       <HintPath>..\libs\TMPE.API.dll</HintPath>
+      <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(ManagedDLLPath)\UnityEngine.dll</HintPath>
@@ -124,5 +127,40 @@
 		</PropertyGroup>
 		<Message Text="removing deploy directory" Importance="high" />
 		<RemoveDir Directories="$(DeployDir)" />
-	</Target>	
+	</Target>
+	<ItemGroup>
+	  <Reference Update="System">
+	    <Private>false</Private>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Update="System.Core">
+	    <Private>false</Private>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Update="System.Data">
+	    <Private>false</Private>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Update="System.Drawing">
+	    <Private>false</Private>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Update="System.Runtime.Serialization">
+	    <Private>false</Private>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Update="System.Xml">
+	    <Private>false</Private>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Update="System.Xml.Linq">
+	    <Private>false</Private>
+	  </Reference>
+	</ItemGroup>	
 </Project>
