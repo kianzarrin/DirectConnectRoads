@@ -1,21 +1,19 @@
-using HarmonyLib;
+using ColossalFramework;
+using KianCommons;
+using KianCommons.Plugins;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using KianCommons;
-using UnityEngine;
-using ColossalFramework;
-using static KianCommons.Math.MathUtil;
 using TrafficManager.Manager.Impl;
-using DirectConnectRoads.Util;
+using UnityEngine;
+using static KianCommons.Math.MathUtil;
 
 namespace DirectConnectRoads.Util {
     public static class NetInfoUtil {
         //public const float ASPHALT_HEIGHT = RoadMeshUtil.ASPHALT_HEIGHT;
         [Obsolete]
         public static void UpdateAllNodes() {
-            Log.Info("UpdateAllNodes() called ...",true);
+            Log.Info("UpdateAllNodes() called ...", true);
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().Info.m_requireDirectRenderers) continue;
@@ -25,12 +23,12 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void UpdateAllNetworkRenderers() {
-            Log.Info("UpdateAllNetworkRenderers() called ...",true);
+            Log.Info("UpdateAllNetworkRenderers() called ...", true);
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
                 NetManager.instance.UpdateNodeRenderer(nodeID, true);
-                foreach(ushort segmentID in NetUtil.IterateNodeSegments(nodeID)) {
+                foreach (ushort segmentID in NetUtil.IterateNodeSegments(nodeID)) {
                     NetManager.instance.UpdateSegmentRenderer(segmentID, true);
                 }
             }
@@ -102,7 +100,7 @@ namespace DirectConnectRoads.Util {
         public static bool HasDCMedian(NetInfo netInfo) {
             foreach (NetInfo.Node nodeInfo in netInfo.m_nodes) {
                 bool isDC = nodeInfo.m_directConnect && nodeInfo.m_connectGroup != 0;
-                if(isDC && DirectConnectUtil.IsMedian(nodeInfo, netInfo))
+                if (isDC && DirectConnectUtil.IsMedian(nodeInfo, netInfo))
                     return true;
             }
             return false;
@@ -212,7 +210,7 @@ namespace DirectConnectRoads.Util {
                 }
 
                 if (UnsupportedRoadWithTrack(info)) {
-                    Log.Debug($"UnsupportedRoadWithTrackTable.Add({info})",false);
+                    Log.Debug($"UnsupportedRoadWithTrackTable.Add({info})", false);
                     UnsupportedRoadWithTrackTable.Add(info);
                     continue;
                 }
@@ -221,8 +219,8 @@ namespace DirectConnectRoads.Util {
                     continue;
                 }
 
-                if(!GetAshphaltOffset(info, out float voffset)) {
-                    if(float.IsNaN(voffset))
+                if (!GetAshphaltOffset(info, out float voffset)) {
+                    if (float.IsNaN(voffset))
                         Log.Debug($"Skipping {info} because it has no car lanes. voffset={voffset}", false);
                     else
                         Log.Debug($"Skipping {info} because it has lanes at different vertical offset. voffset={voffset}", false);
@@ -269,8 +267,7 @@ namespace DirectConnectRoads.Util {
                     netInfo.m_requireDirectRenderers = true;
                     AddedNodes.Add(node);
                 }
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 Log.Error(e.ToString());
             }
         }
@@ -352,8 +349,7 @@ namespace DirectConnectRoads.Util {
                             OriginalTurnAngles[netInfo] = netInfo.m_maxTurnAngle;
                         netInfo.SetMaxTurnAngle(180);
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Log.Error(e.ToString());
                 }
             } // end for            
@@ -363,14 +359,13 @@ namespace DirectConnectRoads.Util {
             foreach (var item in OriginalTurnAngles.Keys) {
                 NetInfo info = item as NetInfo;
                 if (info == null) {
-                    Log.Error("info==null item="+item);
+                    Log.Error("info==null item=" + item);
                     continue;
                 }
                 try {
                     float angle = (float)OriginalTurnAngles[info];
                     info.SetMaxTurnAngle(angle);
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     Log.Error(e.Message);
                 }
             }
@@ -392,13 +387,12 @@ namespace DirectConnectRoads.Util {
                         if (!isMedian) continue;
 
                         var flags = nodeInfo.m_flagsForbidden & ~(NetNode.Flags.Transition | NetNode.Flags.TrafficLights);
-                        if(nodeInfo.m_flagsForbidden != flags) {
+                        if (nodeInfo.m_flagsForbidden != flags) {
                             OriginalForbiddenFalgs[nodeInfo] = nodeInfo.m_flagsForbidden;
                             nodeInfo.m_flagsForbidden = flags;
                         }
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Log.Error(e.ToString());
                 }
             } // end for            
