@@ -58,7 +58,6 @@ namespace DirectConnectRoads.LifeCycle {
             try {
                 Log.Debug("LifeCycle.SimulationDataReady() called");
                 if (!Loaded) {
-                    CheckMedianCommons.Init();
                     NetInfoUtil.LoadDCTextures();
                     NetInfoUtil.FixMaxTurnAngles();
                     NetInfoUtil.FixDCFlags();
