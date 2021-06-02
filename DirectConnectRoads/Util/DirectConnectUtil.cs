@@ -3,14 +3,80 @@ namespace DirectConnectRoads.Util {
     using CSUtil.Commons;
     using KianCommons.Math;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Collections;
     using TrafficManager.API.Traffic.Enums;
     using TrafficManager.Manager.Impl;
     using UnityEngine;
     using KianCommons;
     using VectorUtil = KianCommons.Math.VectorUtil;
+    using System;
 
     public static class DirectConnectUtil {
+        public unsafe struct FastSegmentList : IEnumerable<ushort>{
+            const int MAX_SIZE = 8;
+            int size_;
+            fixed ushort segments_[MAX_SIZE];
+
+            public int Count => size_;
+
+            public void Add(ushort value) {
+                if (size_ >= MAX_SIZE)
+                    throw new Exception("List grows too big (max size is 10)");
+                segments_[size_++] = value;
+            }
+
+            public ushort this[int index] {
+                get {
+                    if (index < size_)
+                        return segments_[index];
+                    else
+                        throw new IndexOutOfRangeException($"index:{index} size:{size_}");
+                }
+                set {
+                    if (index < size_)
+                        segments_[index] = value;
+                    else
+                        throw new IndexOutOfRangeException($"index:{index} size:{size_}");
+                }
+            }
+
+            public void Clear() => size_ = 0;
+
+            #region iterator
+            IEnumerator<ushort> IEnumerable<ushort>.GetEnumerator() => new Iterator(this);
+            IEnumerator IEnumerable.GetEnumerator() => new Iterator(this);
+
+            public struct Iterator : IEnumerator<ushort> {
+                int i_;
+                FastSegmentList list_;
+                ushort current_;
+
+                public Iterator(FastSegmentList list) {
+                    i_ = 0;
+                    list_ = list;
+                    current_ = 0;
+                }
+
+                public bool MoveNext() {
+                    if (i_ < list_.size_) {
+                        current_ = list_[i_++];
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                public void Reset() => i_ = current_ = 0;
+
+                public ushort Current => current_;
+                public Iterator GetEnumerator() => this;
+                public void Dispose() => Reset();
+                object IEnumerator.Current => Current;
+            }
+            #endregion
+        }
+
+
         #region Median Texture Detection
         public static bool IsMedian(this NetInfo.Node nodeInfo, NetInfo netInfo) {
             var nodeInfoVehicleTypes = GetVehicleType(nodeInfo.m_connectGroup);
@@ -79,6 +145,14 @@ namespace DirectConnectRoads.Util {
                    IsMedianBrokenHelper(segmentID2, segmentID1);
         }
 
+        static bool IntersectAny(FastSegmentList segmentsA, FastSegmentList segmentsB) {
+            for (int a = 0; a < segmentsA.Count; ++a)
+                for (int b = 0; b < segmentsB.Count; ++b)
+                    if (segmentsA[a] == segmentsB[b])
+                        return true;
+            return false;
+        }
+
         public static bool IsMedianBrokenHelper(ushort segmentID, ushort otherSegmentID) {
             ushort nodeID = segmentID.ToSegment().GetSharedNode(otherSegmentID);
 
@@ -90,7 +164,7 @@ namespace DirectConnectRoads.Util {
 
             foreach (ushort rightSegmentID in rightSegments) {
                 var targetSegments = GetTargetSegments(rightSegmentID, nodeID);
-                if (targetSegments.Intersect(leftSegments).Count() > 0) {
+                if (IntersectAny(targetSegments, leftSegments)) {
                     //Log.Debug($"intersection detected rightSegmentID:{rightSegmentID} targetSegments:{targetSegments.ToSTR()} leftSegments:{leftSegments.ToSTR()}");
                     return true;
                 }
@@ -108,12 +182,13 @@ namespace DirectConnectRoads.Util {
         /// <param name="sourceSegmentID"></param>
         /// <param name="nodeID"></param>
         /// <returns></returns>
-        public static IEnumerable<ushort> GetTargetSegments(ushort sourceSegmentID, ushort nodeID) {
+        public static FastSegmentList GetTargetSegments(ushort sourceSegmentID, ushort nodeID) {
+            var ret = new FastSegmentList();
             foreach (ushort targetSegmentID in NetUtil.IterateNodeSegments(nodeID)) {
-                if (DoesSegmentGoToSegment(sourceSegmentID, targetSegmentID, nodeID)){
-                    yield return targetSegmentID;
-                }
+                if (DoesSegmentGoToSegment(sourceSegmentID, targetSegmentID, nodeID))
+                    ret.Add(targetSegmentID);
             }
+            return ret;
         }
 
         /// <summary>
@@ -134,7 +209,7 @@ namespace DirectConnectRoads.Util {
             foreach (LaneData sourceLane in sourceLanes) {
                 bool connected;
                 if (LaneConnectionManager.Instance.HasConnections(sourceLane.LaneID, startNode)) {
-                    connected = IsLaneConnectedToSegment(sourceLane, targetSegmentID);
+                    connected = IsLaneConnectedToSegment(sourceLane.LaneID, targetSegmentID);
                     //Log.Debug($"IsLaneConnectedToSegment({sourceLane},{targetSegmentID}) = {connected}");
 
                 } else {
@@ -150,18 +225,20 @@ namespace DirectConnectRoads.Util {
         /// <summary>
         /// Determines if there is any lane connection from source lane to target segment.
         /// </summary>
-        public static bool IsLaneConnectedToSegment(LaneData sourceLane, ushort targetSegmentID) {
-            ushort sourceSegmentID = sourceLane.SegmentID;
+        public static bool IsLaneConnectedToSegment(uint sourceLaneId, ushort targetSegmentID) {
+            ushort sourceSegmentID = sourceLaneId.ToLane().m_segment;
             ushort nodeID = sourceSegmentID.ToSegment().GetSharedNode(targetSegmentID);
             bool sourceStartNode = NetUtil.IsStartNode(sourceSegmentID, nodeID);
             bool targetStartNode = NetUtil.IsStartNode(targetSegmentID, nodeID);
-            var targetLanes = NetUtil.IterateLanes(
+
+
+            var targetLanes = new LaneDataIterator(
                 targetSegmentID,
                 !targetStartNode,// going away from start node.
                 LaneConnectionManager.LANE_TYPES,
                 LaneConnectionManager.VEHICLE_TYPES);
             foreach (LaneData targetLane in targetLanes) {
-                if (LaneConnectionManager.Instance.AreLanesConnected(sourceLane.LaneID, targetLane.LaneID, sourceStartNode))
+                if (LaneConnectionManager.Instance.AreLanesConnected(sourceLaneId, targetLane.LaneID, sourceStartNode))
                     return true;
             }
             return false;
@@ -182,10 +259,11 @@ namespace DirectConnectRoads.Util {
         #endregion
 
         #region Geometry
+
         public static void GetGeometry(ushort segmentID1, ushort segmentID2,
-            out List<ushort> leftSegments, out List<ushort> rightSegments) {
-            leftSegments = new List<ushort>(6);
-            rightSegments = new List<ushort>(6);
+            out FastSegmentList leftSegments, out FastSegmentList rightSegments) {
+            leftSegments = new FastSegmentList();
+            rightSegments = new FastSegmentList();
             ushort nodeID = segmentID1.ToSegment().GetSharedNode(segmentID2);
             var angle0 = GetSegmentsAngle(segmentID1, segmentID2);
             for (int i = 0; i < 8; ++i) {
@@ -201,6 +279,7 @@ namespace DirectConnectRoads.Util {
                 else
                     leftSegments.Add(segmentID);
             }
+
         }
 
         public static float GetSegmentsAngle(ushort from, ushort to) {

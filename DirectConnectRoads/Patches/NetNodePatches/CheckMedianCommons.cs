@@ -10,9 +10,6 @@ namespace DirectConnectRoads.Patches {
 
     using static KianCommons.Patches.TranspilerUtils;
     public static class CheckMedianCommons {
-        public static void Init()=> TMPE_Exists_ = true;
-
-        public static bool TMPE_Exists_ = true;
         public static bool ShouldConnectMedian(
             ushort nodeId,
             int nodeInfoIDX,
