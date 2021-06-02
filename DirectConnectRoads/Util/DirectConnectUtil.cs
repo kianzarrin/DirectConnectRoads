@@ -11,6 +11,7 @@ namespace DirectConnectRoads.Util {
     using VectorUtil = KianCommons.Math.VectorUtil;
     using System;
     using Log = KianCommons.Log;
+    using KianCommons.Plugins;
 
     public static class DirectConnectUtil {
         public unsafe struct FastSegmentList : IEnumerable<ushort>{
@@ -81,6 +82,7 @@ namespace DirectConnectRoads.Util {
         #region Median Texture Detection
         public static bool IsMedian(this NetInfo.Node nodeInfo, NetInfo netInfo) {
             var nodeInfoVehicleTypes = GetVehicleType(nodeInfo.m_connectGroup);
+            nodeInfoVehicleTypes |= nodeInfo.VehicleTypes(); // Adaptive roads
             return (netInfo.m_vehicleTypes & nodeInfoVehicleTypes) == VehicleInfo.VehicleType.None;
         }
 

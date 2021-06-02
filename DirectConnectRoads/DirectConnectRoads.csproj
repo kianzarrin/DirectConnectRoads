@@ -4,8 +4,7 @@
         <TargetFramework>net35</TargetFramework>
         <Deterministic>false</Deterministic>
         <LangVersion>preview</LangVersion>
-        <AssemblyTitle>DirectConnectRoads</AssemblyTitle>
-        <AssemblyVersion>2.0.9.*</AssemblyVersion>
+        <AssemblyVersion>2.1.0.*</AssemblyVersion>
         <DebugType>full</DebugType>
         <DebugSymbols>true</DebugSymbols>
         <PathMap>$(MSBuildProjectDirectory)\=$(ProjectName)\</PathMap>
