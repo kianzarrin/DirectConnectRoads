@@ -10,6 +10,7 @@ namespace DirectConnectRoads.Util {
     using KianCommons;
     using VectorUtil = KianCommons.Math.VectorUtil;
     using System;
+    using Log = KianCommons.Log;
 
     public static class DirectConnectUtil {
         public unsafe struct FastSegmentList : IEnumerable<ushort>{
@@ -27,7 +28,7 @@ namespace DirectConnectRoads.Util {
 
             public ushort this[int index] {
                 get {
-                    if (index < size_)
+                    if (index < size_ && index >=0 )
                         return segments_[index];
                     else
                         throw new IndexOutOfRangeException($"index:{index} size:{size_}");
@@ -58,7 +59,7 @@ namespace DirectConnectRoads.Util {
                 }
 
                 public bool MoveNext() {
-                    if (i_ < list_.size_) {
+                    if (i_ < list_.Count) {
                         current_ = list_[i_++];
                         return true;
                     } else {
@@ -138,6 +139,7 @@ namespace DirectConnectRoads.Util {
             ushort nodeID = segmentID1.ToSegment().GetSharedNode(segmentID2);
             bool connected = DoesSegmentGoToSegment(segmentID1, segmentID2, nodeID);
             connected |= DoesSegmentGoToSegment(segmentID2, segmentID1, nodeID);
+            //Log.Debug("OpenMedian(): connected=" + connected);
             if (!connected)
                 return true;
 
@@ -165,7 +167,7 @@ namespace DirectConnectRoads.Util {
             foreach (ushort rightSegmentID in rightSegments) {
                 var targetSegments = GetTargetSegments(rightSegmentID, nodeID);
                 if (IntersectAny(targetSegments, leftSegments)) {
-                    //Log.Debug($"intersection detected rightSegmentID:{rightSegmentID} targetSegments:{targetSegments.ToSTR()} leftSegments:{leftSegments.ToSTR()}");
+                   //Log.Debug($"intersection detected rightSegmentID:{rightSegmentID} targetSegments:{targetSegments.ToSTR()} leftSegments:{leftSegments.ToSTR()}");
                     return true;
                 }
             }
@@ -201,11 +203,13 @@ namespace DirectConnectRoads.Util {
             }
             ArrowDirection arrowDir = ExtSegmentEndManager.Instance.GetDirection(sourceSegmentID, targetSegmentID, nodeID);
             LaneArrows arrow = ArrowDir2LaneArrows(arrowDir);
-            var sourceLanes = NetUtil.IterateLanes(
+            var sourceLanes = new LaneDataIterator(
                 sourceSegmentID,
                 startNode,
                 LaneArrowManager.LANE_TYPES,
                 LaneArrowManager.VEHICLE_TYPES);
+            //Log.Debug("DoesSegmentGoToSegment: sourceLanes=" + sourceLanes.ToSTR());
+
             foreach (LaneData sourceLane in sourceLanes) {
                 bool connected;
                 if (LaneConnectionManager.Instance.HasConnections(sourceLane.LaneID, startNode)) {
@@ -214,7 +218,7 @@ namespace DirectConnectRoads.Util {
 
                 } else {
                     LaneArrows arrows = LaneArrowManager.Instance.GetFinalLaneArrows(sourceLane.LaneID);
-                    connected = arrows.IsFlagSet(arrow);
+                    connected = (arrows & arrow) != 0;
                 }
                 if (connected)
                     return true;

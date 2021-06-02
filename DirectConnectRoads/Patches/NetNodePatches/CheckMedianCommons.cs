@@ -43,7 +43,7 @@ namespace DirectConnectRoads.Patches {
             }
 
             return !DirectConnectUtil.OpenMedian(sourceSegmentID, targetSegmentID);
-                //.LogRet($"ShouldConnectMedian(sourceSegmentID={sourceSegmentID}, targetSegmentID={targetSegmentID})->");
+                //.LogRet($"OpenMedian(sourceSegmentID={sourceSegmentID}, targetSegmentID={targetSegmentID})");
         }
 
         public static bool Connects(NetInfo source, NetInfo target) {
