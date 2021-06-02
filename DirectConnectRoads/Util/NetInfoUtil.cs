@@ -63,6 +63,15 @@ namespace DirectConnectRoads.Util {
             }
         }
 
+        public static void UpdateAllNodeRenderers() {
+            Log.Info("FullUpdateAllNetworks() called ...", true);
+            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
+                if (!NetUtil.IsNodeValid(nodeID)) continue;
+                if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
+                //Log.Debug("updating node:"+ nodeID);
+                NetManager.instance.UpdateNode(nodeID);
+            }
+        }
 
 
         #region Textures
