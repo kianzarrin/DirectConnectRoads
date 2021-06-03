@@ -16,7 +16,7 @@ namespace DirectConnectRoads.LifeCycle {
             LoadingManager.instance.m_levelPreLoaded += PreLoad; //install harmony
             LoadingManager.instance.m_simulationDataReady += SimulationDataReady; // create DC textures on first load
             LoadingManager.instance.m_levelPreUnloaded += ExitToMainMenu; // undo DC textures when quite to main menue.
-            if (HelpersExtensions.InGame) 
+            if (!Helpers.InStartupMenu) 
                 HotReload();
         }
 
@@ -42,6 +42,7 @@ namespace DirectConnectRoads.LifeCycle {
         public static void HotReload() {
             PreLoad();
             SimulationDataReady();
+            AfterLoad();
         }
 
         // first thing that happens when start game/editor from main menue or load another game.
@@ -63,12 +64,6 @@ namespace DirectConnectRoads.LifeCycle {
                     NetInfoUtil.FixDCFlags();
                 }
 
-                // TODO: which line to uncomment:
-                // NetInfoUtil.UpdateAllNetworkRenderers();
-                // NetInfoUtil.FastUpdateAllNetworks();
-                // NetInfoUtil.FullUpdateAllNetworks();
-                NetInfoUtil.UpdateAllNodeRenderers();
-
                 Loaded = true;
             }
             catch (Exception e) {
@@ -82,6 +77,7 @@ namespace DirectConnectRoads.LifeCycle {
                 // NetInfoUtil.UpdateAllNetworkRenderers();
                 // NetInfoUtil.FastUpdateAllNetworks();
                 // NetInfoUtil.FullUpdateAllNetworks();
+                NetInfoUtil.UpdateAllNodeRenderers();
             });
         }
 
