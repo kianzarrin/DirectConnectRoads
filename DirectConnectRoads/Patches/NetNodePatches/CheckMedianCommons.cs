@@ -22,8 +22,8 @@ namespace DirectConnectRoads.Patches {
             if (!info.IsRoad())
                 return true; // ignore
             if (!DirectConnectUtil.IsMedian(nodeInfo, info)) {
-                //Log.Debug($"not a median: node:{nodeId} connect_group:{nodeInfo.m_connectGroup} " +
-                //    $"vehcileTypes:{info.m_vehicleTypes}",false);
+                //Log.Debug($"not a median: node:{nodeId} segmentId:{sourceSegmentID} connect_group:{nodeInfo.m_connectGroup} " +
+                //    $"vehcileTypes:{info.m_vehicleTypes}", false);
                 return true; // ignore.
             }
             if (NetInfoUtil.UnsupportedRoadWithTrackTable.Contains(info)) {

@@ -81,8 +81,14 @@ namespace DirectConnectRoads.Util {
 
         #region Median Texture Detection
         public static bool IsMedian(this NetInfo.Node nodeInfo, NetInfo netInfo) {
+            //ReflectionHelpers.LogCalled(nodeInfo.m_nodeMesh.name, netInfo.name); 
             var nodeInfoVehicleTypes = GetVehicleType(nodeInfo.m_connectGroup);
             nodeInfoVehicleTypes |= nodeInfo.VehicleTypes(); // Adaptive roads
+            //Log.Debug(
+            //    $"nodeInfo.m_connectGroup={nodeInfo.m_connectGroup}, " +
+            //    $"nodeInfo.VehicleTypes()={nodeInfo.VehicleTypes()}, " +
+            //    $"nodeInfoVehicleTypes={nodeInfoVehicleTypes}, " +
+            //    $"netInfo.m_vehicleTypes={netInfo.m_vehicleTypes}");
             return (netInfo.m_vehicleTypes & nodeInfoVehicleTypes) == VehicleInfo.VehicleType.None;
         }
 
