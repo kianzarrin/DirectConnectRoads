@@ -86,9 +86,9 @@ namespace DirectConnectRoads.UI {
 
             bool exempt = DCRConfig.Config.Exemptions.Contains(info.name);
             if (!exempt)
-                ShowToolInfo(true, "click to exempt road from DCR", HitPos);
+                ShowToolInfo(true, "click to exempt asset from DCR", HitPos);
             else
-                ShowToolInfo(true, "click to mange road by DCR", HitPos);
+                ShowToolInfo(true, "click to manage asset by DCR", HitPos);
         }
 
         protected override void OnSecondaryMouseClicked() {
