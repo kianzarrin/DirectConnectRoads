@@ -44,7 +44,7 @@ namespace DirectConnectRoads.UI {
             var info = HoveredSegmentID.ToSegment().Info;
             bool supported = 
                 info && info.IsRoad() && 
-                NetInfoUtil.UnsupportedRoadWithTrackTable.Contains(info) &&
+                !NetInfoUtil.UnsupportedRoadWithTrackTable.Contains(info) &&
                 API.InvokeShouldManageDCNodes(info, HoveredSegmentID , 0);
 
             if (!supported)
@@ -85,11 +85,10 @@ namespace DirectConnectRoads.UI {
             }
 
             bool exempt = DCRConfig.Config.Exemptions.Contains(info.name);
-            var pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             if (!exempt)
-                ShowToolInfo(true, "click to exempt road from DCR", pos);
+                ShowToolInfo(true, "click to exempt road from DCR", HitPos);
             else
-                ShowToolInfo(true, "click to mange road by DCR", pos);
+                ShowToolInfo(true, "click to mange road by DCR", HitPos);
         }
 
         protected override void OnSecondaryMouseClicked() {
