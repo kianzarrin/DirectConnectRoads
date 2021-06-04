@@ -14,7 +14,7 @@ namespace DirectConnectRoads.UI {
     using System.Collections;
     using DirectConnectRoads.Util;
 
-    public class DCRTool : KianToolBase {
+    public class DCRTool : KianToolBase<DCRTool> {
         UIComponent button_;
 
         protected override void Awake() {

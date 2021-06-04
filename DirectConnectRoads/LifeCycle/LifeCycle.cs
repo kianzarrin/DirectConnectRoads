@@ -3,6 +3,7 @@ using KianCommons;
 using DirectConnectRoads.Util;
 using CitiesHarmony.API;
 using System;
+using static KianCommons.ReflectionHelpers;
 
 namespace DirectConnectRoads.LifeCycle {
     public static class LifeCycle {
@@ -22,6 +23,7 @@ namespace DirectConnectRoads.LifeCycle {
         }
 
         public static void Disable() {
+            LogCalled();
             LoadingManager.instance.m_levelPreLoaded -= PreLoad; //install harmony
             LoadingManager.instance.m_simulationDataReady -= SimulationDataReady;
             LoadingManager.instance.m_levelPreUnloaded -= ExitToMainMenu;
@@ -41,6 +43,7 @@ namespace DirectConnectRoads.LifeCycle {
         #endregion
 
         public static void HotReload() {
+            LogCalled();
             PreLoad();
             SimulationDataReady();
             AfterLoad();
@@ -49,7 +52,7 @@ namespace DirectConnectRoads.LifeCycle {
         // first thing that happens when start game/editor from main menue or load another game.
         public static void PreLoad() {
             try {
-                Log.Debug("LifeCycle.PreLoad() called");
+                LogCalled();
                 HarmonyUtil.InstallHarmony(HarmonyId); // if not installed already.
             } catch (Exception e) {
                 Log.Exception(e);
@@ -58,7 +61,7 @@ namespace DirectConnectRoads.LifeCycle {
 
         public static void SimulationDataReady() {
             try {
-                Log.Debug("LifeCycle.SimulationDataReady() called");
+                LogCalled();
                 if (!Loaded) {
                     NetInfoUtil.LoadDCTextures();
                     NetInfoUtil.FixMaxTurnAngles();
@@ -73,6 +76,7 @@ namespace DirectConnectRoads.LifeCycle {
         }
 
         public static void AfterLoad() {
+            LogCalled();
             SimulationManager.instance.AddAction(delegate () {
                 // TODO: which line to uncomment:
                 // NetInfoUtil.UpdateAllNetworkRenderers();
@@ -80,11 +84,13 @@ namespace DirectConnectRoads.LifeCycle {
                 // NetInfoUtil.FullUpdateAllNetworks();
                 NetInfoUtil.UpdateAllNodeRenderers();
             });
+            UI.DCRTool.Create();
         }
 
         public static void ExitToMainMenu() {
             if (!Loaded) return; // protect against Disabling mod from main menu.
-            Log.Debug("LifeCycle.Quite() called");
+            LogCalled();
+            UI.DCRTool.Create();
             NetInfoUtil.RestoreFlags();
             NetInfoUtil.RestoreMaxTurnAngles();
             NetInfoUtil.UnloadDCTextures();
