@@ -189,5 +189,10 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Resources\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="Resources\B.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>	
 </Project>
