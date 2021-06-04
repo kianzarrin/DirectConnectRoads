@@ -241,6 +241,11 @@ namespace DirectConnectRoads.Util {
                     continue;
                 }
 
+                if (!API.InvokeShouldManageDCNodes(info, 0, 0)) {
+                    Log.Debug($"Skipping {info} because InvokeShouldManageDCNodes() returned false", false);
+                    continue;
+                }
+
                 AddDCTextures(info, voffset);
             } // end for
         }

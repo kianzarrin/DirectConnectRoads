@@ -45,7 +45,7 @@ namespace DirectConnectRoads.UI {
             bool supported = 
                 info && info.IsRoad() && 
                 NetInfoUtil.UnsupportedRoadWithTrackTable.Contains(info) &&
-                API.InvokeShouldManageDCNodes(info);
+                API.InvokeShouldManageDCNodes(info, HoveredSegmentID , 0);
 
             if (!supported)
                 return null;

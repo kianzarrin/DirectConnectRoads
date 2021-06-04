@@ -92,7 +92,6 @@
     <Compile Remove="KianCommons\KianCommons\Util\AssemblyTypeExtensions.cs" />
     <Compile Remove="KianCommons\KianCommons\Util\AuxilaryThread.cs" />
     <Compile Remove="KianCommons\KianCommons\Util\CSURUtil.cs" />
-    <Compile Remove="KianCommons\KianCommons\Util\GridUtil.cs" />
     <Compile Remove="KianCommons\KianCommons\Util\StackHelpers.cs" />
     <Compile Remove="KianCommons\KianCommons\UI\Helpers\UIAutoSizePanel.cs" />
     <Compile Remove="KianCommons\KianCommons\UI\Helpers\UIButtonExt.cs" />

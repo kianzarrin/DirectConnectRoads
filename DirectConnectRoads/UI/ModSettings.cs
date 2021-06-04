@@ -1,13 +1,6 @@
 ﻿namespace DirectConnectRoads.UI {
-    using ColossalFramework;
-    using ColossalFramework.UI;
-    using ICities;
-    using System;
-    using UnifiedUI.Helpers;
-    using UnityEngine;
-    using UnityEngine.SceneManagement;
     using KianCommons;
-    using KianCommons.UI;
+    using System;
 
     public static class ModSettings {
 
