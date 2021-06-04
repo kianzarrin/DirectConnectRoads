@@ -4,8 +4,8 @@
         <TargetFramework>net35</TargetFramework>
         <Deterministic>false</Deterministic>
         <LangVersion>preview</LangVersion>
-        <AssemblyVersion>2.1.0.*</AssemblyVersion>
-        <DebugType>full</DebugType>
+        <AssemblyVersion>2.1.1.*</AssemblyVersion>
+		<DebugType>pdbonly</DebugType>
         <DebugSymbols>true</DebugSymbols>
         <PathMap>$(MSBuildProjectDirectory)\=$(ProjectName)\</PathMap>
         <Configurations>Debug;Release;Workshop</Configurations>

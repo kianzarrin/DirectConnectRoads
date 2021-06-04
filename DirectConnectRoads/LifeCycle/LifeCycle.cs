@@ -11,6 +11,7 @@ namespace DirectConnectRoads.LifeCycle {
 
         #region extension calls
         public static void Enable() {
+            Log.Debug(Environment.StackTrace);
             Loaded = false;
             HarmonyHelper.EnsureHarmonyInstalled();
             LoadingManager.instance.m_levelPreLoaded += PreLoad; //install harmony
