@@ -166,16 +166,16 @@ namespace DirectConnectRoads.Util {
         public static bool IsMedianBrokenHelper(ushort segmentID, ushort otherSegmentID) {
             ushort nodeID = segmentID.ToSegment().GetSharedNode(otherSegmentID);
 
-            GetGeometry(segmentID, otherSegmentID, out var leftSegments, out var rightSegments);
-            leftSegments.Add(segmentID); // non of the left segments shall go to current segment.
-            rightSegments.Add(segmentID); // current segment shall not go to any of the left segments(including iteself)
+            GetGeometry(segmentID, otherSegmentID, out var farSegments, out var nearSegments);
+            farSegments.Add(segmentID); // non of the far segments shall go to current segment.
+            nearSegments.Add(segmentID); // current segment shall not go to any of the far segments(including iteself)
             //Log.Debug($"IsMedianBrokenHelper({segmentID} ,{otherSegmentID}) :\n" +
-            //    $"leftSegments={leftSegments.ToSTR()} , rightSegments={rightSegments.ToSTR()}");
+            //    $"farSegments={farSegments.ToSTR()} , nearSegments={nearSegments.ToSTR()}");
 
-            foreach (ushort rightSegmentID in rightSegments) {
-                var targetSegments = GetTargetSegments(rightSegmentID, nodeID);
-                if (IntersectAny(targetSegments, leftSegments)) {
-                   //Log.Debug($"intersection detected rightSegmentID:{rightSegmentID} targetSegments:{targetSegments.ToSTR()} leftSegments:{leftSegments.ToSTR()}");
+            foreach (ushort nearSegmentID in nearSegments) {
+                var targetSegments = GetTargetSegments(nearSegmentID, nodeID);
+                if (IntersectAny(targetSegments, farSegments)) {
+                   //Log.Debug($"intersection detected nearSegmentID:{nearSegmentID} targetSegments:{targetSegments.ToSTR()} farSegments:{farSegments.ToSTR()}");
                     return true;
                 }
             }
@@ -273,9 +273,9 @@ namespace DirectConnectRoads.Util {
         #region Geometry
 
         public static void GetGeometry(ushort segmentID1, ushort segmentID2,
-            out FastSegmentList leftSegments, out FastSegmentList rightSegments) {
-            leftSegments = new FastSegmentList();
-            rightSegments = new FastSegmentList();
+            out FastSegmentList farSegments, out FastSegmentList nearSegments) {
+            farSegments = new FastSegmentList();
+            nearSegments = new FastSegmentList();
             ushort nodeID = segmentID1.ToSegment().GetSharedNode(segmentID2);
             var angle0 = GetSegmentsAngle(segmentID1, segmentID2);
             for (int i = 0; i < 8; ++i) {
@@ -283,13 +283,14 @@ namespace DirectConnectRoads.Util {
                 if (segmentID == 0 || segmentID == segmentID1 || segmentID == segmentID2)
                     continue;
                 var angle = GetSegmentsAngle(segmentID1, segmentID);
-                bool right = VectorUtil.CompareAngles_CCW_Right(source: angle0, target: angle);
+                bool near = VectorUtil.CompareAngles_CCW_Right(source: angle0, target: angle);
+                near = near ^ NetUtil.LHT;
                 //Log.Debug($"GetGeometry({segmentID1}, {segmentID2}) : segment:{segmentID}\n" +
-                //    $" CompareAngles_CCW_Right(angle0:{angle0*Mathf.Rad2Deg}, angle:{angle*Mathf.Rad2Deg}) -> {right}");
-                if (right)
-                    rightSegments.Add(segmentID);
+                //    $" CompareAngles_CCW_Right(angle0:{angle0*Mathf.Rad2Deg}, angle:{angle*Mathf.Rad2Deg}) -> {near}");
+                if (near)
+                    nearSegments.Add(segmentID);
                 else
-                    leftSegments.Add(segmentID);
+                    farSegments.Add(segmentID);
             }
 
         }
