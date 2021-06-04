@@ -90,7 +90,7 @@ namespace DirectConnectRoads.LifeCycle {
         public static void ExitToMainMenu() {
             if (!Loaded) return; // protect against Disabling mod from main menu.
             LogCalled();
-            UI.DCRTool.Create();
+            UI.DCRTool.Release();
             NetInfoUtil.RestoreFlags();
             NetInfoUtil.RestoreMaxTurnAngles();
             NetInfoUtil.UnloadDCTextures();
