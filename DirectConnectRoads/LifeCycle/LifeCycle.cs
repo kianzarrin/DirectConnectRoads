@@ -84,7 +84,9 @@ namespace DirectConnectRoads.LifeCycle {
                 // NetInfoUtil.FullUpdateAllNetworks();
                 NetInfoUtil.UpdateAllNodeRenderers();
             });
+#if DEBUG
             UI.DCRTool.Create();
+#endif
         }
 
         public static void ExitToMainMenu() {
