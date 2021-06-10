@@ -1,1 +1,6 @@
-why DC does not connect from straight tram tracks. (mono rail has no problem)
+1- if the road has medium pedestrian lanes DC does not connect because we don't want to hide pedestrian lanes
+    - to fix this we need to cut only the median and not the road.
+2- tram support:
+    - because of 1 many tram roads are unsupported.
+    - additionally once we fix 1 the problem will be that tram tracks cross median.
+    - to fix this we need to take tram roads into consideration too when checking if segment is connected to segment.
