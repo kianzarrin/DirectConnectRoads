@@ -74,7 +74,6 @@
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-    <None Include="todo.txt" />
     <Compile Remove="KianCommons\KianCommons\LifeCycleBase.cs" />
     <Compile Remove="KianCommons\KianCommons\Patches\PrefixUtils.cs" />
     <Compile Remove="KianCommons\KianCommons\Plugins\CSURUtil.cs" />

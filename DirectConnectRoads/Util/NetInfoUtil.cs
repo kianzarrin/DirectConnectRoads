@@ -145,7 +145,7 @@ namespace DirectConnectRoads.Util {
 
             if (tramTracks.Count == 2) {
                 var dist = Mathf.Abs(tramTracks[0].m_position - tramTracks[1].m_position);
-                bool HasARNodeVeicleTypes = info.m_nodes.Any(_node=>_node.VehicleTypes() != 0);
+                bool HasARNodeVeicleTypes = info.m_nodes.Any(_node=>_node.ARVehicleTypes() != 0);
 
                 Log.Debug($"UnsupportedRoadWithTrack({info.name}) : tram dist = {dist} HasARNodeVeicleType={HasARNodeVeicleTypes}", false);
                 if (dist > 6.3f && !HasARNodeVeicleTypes) 
