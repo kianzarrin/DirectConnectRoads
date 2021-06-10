@@ -1,4 +1,4 @@
-﻿extern alias UUILib;
+extern alias UUILib;
 
 namespace DirectConnectRoads.UI {
     using ColossalFramework;
@@ -20,7 +20,7 @@ namespace DirectConnectRoads.UI {
         protected override void Awake() {
             try {
                 base.Awake();
-                string sprites = UUIHelpers.GetFullPath<LifeCycle.Mod>("B.png");
+                string sprites = UUIHelpers.GetFullPath<LifeCycle.Mod>("uui_cjm_dcr.png");
                 Debug.Log("[UUIExampleMod] ExampleTool.Awake() sprites=" + sprites);
                 button_ = UUIHelpers.RegisterToolButton(
                     name: "DirectConnectRoad",

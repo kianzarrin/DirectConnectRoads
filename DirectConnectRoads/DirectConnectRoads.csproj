@@ -3,7 +3,7 @@
 		<TargetFramework>net35</TargetFramework>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Deterministic>false</Deterministic>
-		<AssemblyVersion>2.4.0.*</AssemblyVersion>
+		<AssemblyVersion>2.4.1.*</AssemblyVersion>
 		<LangVersion>preview</LangVersion>
 		<DebugType>pdbonly</DebugType>
 		<DebugSymbols>true</DebugSymbols>
@@ -186,10 +186,10 @@
 	  </Reference>
 	</ItemGroup>
 	<ItemGroup>
-	  <None Update="Resources\B.png">
+	  <None Update="Resources\PreviewImage.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Resources\PreviewImage.png">
+	  <None Update="Resources\uui_cjm_dcr.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>	
