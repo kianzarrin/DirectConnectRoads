@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using KianCommons;
-using ColossalFramework;
 
 namespace DirectConnectRoads.Patches {
     using DirectConnectRoads.Util;
@@ -21,7 +20,7 @@ namespace DirectConnectRoads.Patches {
             NetInfo.Node nodeInfo = info.m_nodes[nodeInfoIDX];
             if (!info.IsRoad())
                 return true; // ignore
-            if (!DirectConnectUtil.IsMedian(nodeInfo, info)) {
+            if (!DCUtil.IsMedian(nodeInfo, info)) {
                 //Log.Debug($"not a median: node:{nodeId} segmentId:{sourceSegmentID} connect_group:{nodeInfo.m_connectGroup} " +
                 //    $"vehcileTypes:{info.m_vehicleTypes}", false);
                 return true; // ignore.

@@ -2,6 +2,7 @@ using ColossalFramework;
 using KianCommons;
 using KianCommons.Plugins;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using TrafficManager.Manager.Impl;
@@ -109,7 +110,7 @@ namespace DirectConnectRoads.Util {
         public static bool HasDCMedian(NetInfo netInfo) {
             foreach (NetInfo.Node nodeInfo in netInfo.m_nodes) {
                 bool isDC = nodeInfo.m_directConnect && nodeInfo.m_connectGroup != 0;
-                if (isDC && DirectConnectUtil.IsMedian(nodeInfo, netInfo))
+                if (isDC && DCUtil.IsMedian(nodeInfo, netInfo))
                     return true;
             }
             return false;
@@ -144,8 +145,11 @@ namespace DirectConnectRoads.Util {
 
             if (tramTracks.Count == 2) {
                 var dist = Mathf.Abs(tramTracks[0].m_position - tramTracks[1].m_position);
-                Log.Debug($"UnsupportedRoadWithTrack({info.name}) : tram dist = " + dist, false);
-                if (dist > 6.3f) return true;
+                bool HasARNodeVeicleTypes = info.m_nodes.Any(_node=>_node.VehicleTypes() != 0);
+
+                Log.Debug($"UnsupportedRoadWithTrack({info.name}) : tram dist = {dist} HasARNodeVeicleType={HasARNodeVeicleTypes}", false);
+                if (dist > 6.3f && !HasARNodeVeicleTypes) 
+                    return true;
             }
 
             if (trainTracks.Count == 2) {
@@ -355,7 +359,7 @@ namespace DirectConnectRoads.Util {
                         continue;
                     bool hasTracks = false;
                     foreach (var nodeInfo in netInfo.m_nodes) {
-                        bool isMedian = DirectConnectUtil.IsMedian(nodeInfo: nodeInfo, netInfo: netInfo);
+                        bool isMedian = DCUtil.IsMedian(nodeInfo: nodeInfo, netInfo: netInfo);
                         hasTracks = nodeInfo.m_directConnect && !isMedian;
                     }
                     if (!hasTracks) {
@@ -397,7 +401,7 @@ namespace DirectConnectRoads.Util {
                     if (netInfo?.m_netAI == null || netInfo.m_nodes == null) continue;
                     foreach (var nodeInfo in netInfo.m_nodes) {
                         if (!nodeInfo.m_directConnect) continue;
-                        bool isMedian = DirectConnectUtil.IsMedian(nodeInfo: nodeInfo, netInfo: netInfo);
+                        bool isMedian = DCUtil.IsMedian(nodeInfo: nodeInfo, netInfo: netInfo);
                         if (!isMedian) continue;
 
                         var flags = nodeInfo.m_flagsForbidden & ~(NetNode.Flags.Transition | NetNode.Flags.TrafficLights);

@@ -1,147 +1,13 @@
 namespace DirectConnectRoads.Util {
-    using ColossalFramework;
     using CSUtil.Commons;
+    using KianCommons;
     using KianCommons.Math;
-    using System.Collections.Generic;
-    using System.Collections;
     using TrafficManager.API.Traffic.Enums;
     using TrafficManager.Manager.Impl;
     using UnityEngine;
-    using KianCommons;
     using VectorUtil = KianCommons.Math.VectorUtil;
-    using System;
-    using Log = KianCommons.Log;
-    using KianCommons.Plugins;
 
     public static class DirectConnectUtil {
-        public unsafe struct FastSegmentList : IEnumerable<ushort>{
-            const int MAX_SIZE = 8;
-            int size_;
-            fixed ushort segments_[MAX_SIZE];
-
-            public int Count => size_;
-
-            public void Add(ushort value) {
-                if (size_ >= MAX_SIZE)
-                    throw new Exception("List grows too big (max size is 10)");
-                segments_[size_++] = value;
-            }
-
-            public ushort this[int index] {
-                get {
-                    if (index < size_ && index >=0 )
-                        return segments_[index];
-                    else
-                        throw new IndexOutOfRangeException($"index:{index} size:{size_}");
-                }
-                set {
-                    if (index < size_)
-                        segments_[index] = value;
-                    else
-                        throw new IndexOutOfRangeException($"index:{index} size:{size_}");
-                }
-            }
-
-            public void Clear() => size_ = 0;
-
-            #region iterator
-            IEnumerator<ushort> IEnumerable<ushort>.GetEnumerator() => new Iterator(this);
-            IEnumerator IEnumerable.GetEnumerator() => new Iterator(this);
-
-            public struct Iterator : IEnumerator<ushort> {
-                int i_;
-                FastSegmentList list_;
-                ushort current_;
-
-                public Iterator(FastSegmentList list) {
-                    i_ = 0;
-                    list_ = list;
-                    current_ = 0;
-                }
-
-                public bool MoveNext() {
-                    if (i_ < list_.Count) {
-                        current_ = list_[i_++];
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-
-                public void Reset() => i_ = current_ = 0;
-
-                public ushort Current => current_;
-                public Iterator GetEnumerator() => this;
-                public void Dispose() => Reset();
-                object IEnumerator.Current => Current;
-            }
-            #endregion
-        }
-
-
-        #region Median Texture Detection
-        public static bool IsMedian(this NetInfo.Node nodeInfo, NetInfo netInfo) {
-            //ReflectionHelpers.LogCalled(nodeInfo.m_nodeMesh.name, netInfo.name); 
-            var nodeInfoVehicleTypes = GetVehicleType(nodeInfo.m_connectGroup);
-            nodeInfoVehicleTypes |= nodeInfo.VehicleTypes(); // Adaptive roads
-            //Log.Debug(
-            //    $"nodeInfo.m_connectGroup={nodeInfo.m_connectGroup}, " +
-            //    $"nodeInfo.VehicleTypes()={nodeInfo.VehicleTypes()}, " +
-            //    $"nodeInfoVehicleTypes={nodeInfoVehicleTypes}, " +
-            //    $"netInfo.m_vehicleTypes={netInfo.m_vehicleTypes}");
-            return (netInfo.m_vehicleTypes & nodeInfoVehicleTypes) == VehicleInfo.VehicleType.None;
-        }
-
-        //public const VehicleInfo.VehicleType TRACK_VEHICLE_TYPES =
-        //    VehicleInfo.VehicleType.Tram |
-        //    VehicleInfo.VehicleType.Metro |
-        //    VehicleInfo.VehicleType.Train |
-        //    VehicleInfo.VehicleType.Monorail;
-        internal static VehicleInfo.VehicleType GetVehicleType(NetInfo.ConnectGroup flags) {
-            VehicleInfo.VehicleType ret = 0;
-            const NetInfo.ConnectGroup TRAM =
-                NetInfo.ConnectGroup.CenterTram |
-                NetInfo.ConnectGroup.NarrowTram |
-                NetInfo.ConnectGroup.SingleTram |
-                NetInfo.ConnectGroup.WideTram;
-            const NetInfo.ConnectGroup TRAIN =
-                NetInfo.ConnectGroup.DoubleTrain |
-                NetInfo.ConnectGroup.SingleTrain |
-                NetInfo.ConnectGroup.TrainStation;
-            const NetInfo.ConnectGroup MONO_RAIL =
-                NetInfo.ConnectGroup.DoubleMonorail |
-                NetInfo.ConnectGroup.SingleMonorail |
-                NetInfo.ConnectGroup.MonorailStation;
-            const NetInfo.ConnectGroup METRO =
-                NetInfo.ConnectGroup.DoubleMetro |
-                NetInfo.ConnectGroup.SingleMetro |
-                NetInfo.ConnectGroup.MetroStation;
-            const NetInfo.ConnectGroup TROLLY =
-                NetInfo.ConnectGroup.CenterTrolleybus |
-                NetInfo.ConnectGroup.NarrowTrolleybus |
-                NetInfo.ConnectGroup.SingleTrolleybus |
-                NetInfo.ConnectGroup.WideTrolleybus;
-
-            if ((flags & TRAM) != 0) {
-                ret |= VehicleInfo.VehicleType.Tram;
-                ret |= VehicleInfo.VehicleType.Metro; // MOM
-            }
-            if ((flags & METRO) != 0) {
-                ret |= VehicleInfo.VehicleType.Metro;
-            }
-            if ((flags & TRAIN) != 0) {
-                ret |= VehicleInfo.VehicleType.Train;
-            }
-            if ((flags & MONO_RAIL) != 0) {
-                ret |= VehicleInfo.VehicleType.Monorail;
-            }
-            if ((flags & TROLLY) != 0) {
-                ret |= VehicleInfo.VehicleType.Trolleybus;
-            }
-            return ret;
-        }
-        #endregion
-
         #region Broken Median detection
         public static bool OpenMedian(ushort segmentID1, ushort segmentID2) {
             ushort nodeID = segmentID1.ToSegment().GetSharedNode(segmentID2);
@@ -175,7 +41,7 @@ namespace DirectConnectRoads.Util {
             foreach (ushort nearSegmentID in nearSegments) {
                 var targetSegments = GetTargetSegments(nearSegmentID, nodeID);
                 if (IntersectAny(targetSegments, farSegments)) {
-                   //Log.Debug($"intersection detected nearSegmentID:{nearSegmentID} targetSegments:{targetSegments.ToSTR()} farSegments:{farSegments.ToSTR()}");
+                    //Log.Debug($"intersection detected nearSegmentID:{nearSegmentID} targetSegments:{targetSegments.ToSTR()} farSegments:{farSegments.ToSTR()}");
                     return true;
                 }
             }
