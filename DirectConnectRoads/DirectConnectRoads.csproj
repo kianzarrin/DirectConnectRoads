@@ -85,7 +85,6 @@
     <Compile Remove="KianCommons\KianCommons\Serialization\SerializationUtil.cs" />
     <Compile Remove="KianCommons\KianCommons\Serialization\Vector3Serializable.cs" />
     <Compile Remove="KianCommons\KianCommons\Serialization\XMLUtil.cs" />
-    <Compile Remove="KianCommons\KianCommons\UI\TextureUtil.cs" />
     <Compile Remove="KianCommons\KianCommons\UI\UIExtensions.cs" />
     <Compile Remove="KianCommons\KianCommons\UI\UIToolButton.cs" />
     <Compile Remove="KianCommons\KianCommons\UI\UIUtils.cs" />
