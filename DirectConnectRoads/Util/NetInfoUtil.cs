@@ -144,7 +144,7 @@ namespace DirectConnectRoads.Util {
 
             if (tramTracks.Count == 2) {
                 var dist = Mathf.Abs(tramTracks[0].m_position - tramTracks[1].m_position);
-                Log.Debug($"UnsupportedRoadWithTrack({info.name} tram dist = " + dist, false);
+                Log.Debug($"UnsupportedRoadWithTrack({info.name}) : tram dist = " + dist, false);
                 if (dist > 6.3f) return true;
             }
 
