@@ -3,7 +3,7 @@
 		<TargetFramework>net35</TargetFramework>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Deterministic>false</Deterministic>
-		<AssemblyVersion>2.4.1.*</AssemblyVersion>
+		<AssemblyVersion>2.4.2.*</AssemblyVersion>
 		<LangVersion>preview</LangVersion>
 		<DebugType>pdbonly</DebugType>
 		<DebugSymbols>true</DebugSymbols>
