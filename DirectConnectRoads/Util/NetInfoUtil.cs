@@ -123,6 +123,9 @@ namespace DirectConnectRoads.Util {
         /// or if tracks are too far apart.
         /// </summary>
         public static bool UnsupportedRoadWithTrack(NetInfo info) {
+            if (info.IsAdaptive())
+                return false; // handled else where.
+
             //Log.Debug($"UnsupportedRoadWithTrack({info.name}) called", false);
             var trainTracks = new List<NetInfo.Lane>();
             var tramTracks = new List<NetInfo.Lane>();
@@ -145,10 +148,9 @@ namespace DirectConnectRoads.Util {
 
             if (tramTracks.Count == 2) {
                 var dist = Mathf.Abs(tramTracks[0].m_position - tramTracks[1].m_position);
-                bool HasARNodeVeicleTypes = info.m_nodes.Any(_node=>_node.ARVehicleTypes() != 0);
 
-                Log.Debug($"UnsupportedRoadWithTrack({info.name}) : tram dist = {dist} HasARNodeVeicleType={HasARNodeVeicleTypes}", false);
-                if (dist > 6.3f && !HasARNodeVeicleTypes) 
+                Log.Debug($"UnsupportedRoadWithTrack({info.name}) : tram dist = {dist}", false);
+                if (dist > 6.3f) 
                     return true;
             }
 
