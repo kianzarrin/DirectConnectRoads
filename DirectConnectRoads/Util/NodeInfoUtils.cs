@@ -30,22 +30,22 @@ namespace DirectConnectRoads {
 
         public static IEnumerable<NetInfo.Node> CreateDCNodes(NetInfo.Node template, NetInfo netInfo, float voffset/* = NetInfoUtil.ASPHALT_HEIGHT*/) {
             Assertion.AssertNotNull(netInfo, "netInfo");
-            Log.Debug($"CreateDCNode({netInfo},{voffset}) called", false);
+            Log.Info($"CreateDCNode({netInfo},{voffset}) called", false);
             var ret = new List<NetInfo.Node>();
             for (int i = 0; i < netInfo.m_segments.Length; ++i) {
                 var segmentInfo = netInfo.m_segments[i];
                 if (!IsSegmentInfoSuitable(segmentInfo)) {
-                    Log.Debug($"Skiping segment[{i}]",false);
+                    Log.Info($"Skiping segment[{i}]",false);
                     continue;
                 }
-                Log.Debug($"processing segment[{i}]", false);
+                Log.Info($"processing segment[{i}]", false);
                 var material = new Material(segmentInfo.m_material);
                 var mesh = segmentInfo.m_mesh;
                 //Log.Debug("[1] mesh=" + mesh?.name ?? "null", false);
                 mesh = mesh?.CutOutRoadSides(voffset);
                 mesh?.Elevate();
                 if (mesh == null || material == null) {
-                    Log.Debug("CreateDCNode failed for " + netInfo.name, false);
+                    Log.Info("skipping null ...", false);
                     continue;
                 }
 
@@ -74,8 +74,10 @@ namespace DirectConnectRoads {
                 node.m_lodMesh = null;
                 node.m_combinedLod = null;
 
-                Log.Debug("CreateDCNode sucessful for " + netInfo.name, false);
-                node.m_nodeMesh.DumpMesh($"DC mesh for {netInfo.name}");
+                Log.Info("CreateDCNode sucessful for " + netInfo.name, false);
+#if DEBUG
+                //node.m_nodeMesh.DumpMesh($"DC mesh for {netInfo.name}");
+#endif
                 ret.Add(node);
             }
             return ret;

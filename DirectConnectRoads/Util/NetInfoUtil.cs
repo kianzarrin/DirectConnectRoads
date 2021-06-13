@@ -149,7 +149,7 @@ namespace DirectConnectRoads.Util {
             if (tramTracks.Count == 2) {
                 var dist = Mathf.Abs(tramTracks[0].m_position - tramTracks[1].m_position);
 
-                Log.Debug($"UnsupportedRoadWithTrack({info.name}) : tram dist = {dist}", false);
+                Log.Info($"UnsupportedRoadWithTrack({info.name}) : tram dist = {dist}", false);
                 if (dist > 6.3f) 
                     return true;
             }
@@ -215,40 +215,40 @@ namespace DirectConnectRoads.Util {
                 if (!info.IsRoad())
                     continue;
                 if (!info.IsNormalSymetricalTwoWay()) {
-                    Log.Debug($"Skipping {info} because it is !IsNormalSymetricalTwoWay()", false);
+                    Log.Info($"Skipping {info} because it is !IsNormalSymetricalTwoWay()", false);
                     continue;
                 }
 
                 if (!info.m_hasPedestrianLanes) {
-                    Log.Debug($"Skipping {info} because it has no pedestrian lanes", false);
+                    Log.Info($"Skipping {info} because it has no pedestrian lanes", false);
                     continue;
                 }
 
                 if (UnsupportedRoadWithTrack(info)) {
-                    Log.Debug($"UnsupportedRoadWithTrackTable.Add({info})", false);
+                    Log.Info($"UnsupportedRoadWithTrackTable.Add({info})", false);
                     UnsupportedRoadWithTrackTable.Add(info);
                     continue;
                 }
                 if (HasDCMedian(info)) {
-                    Log.Debug($"Skipping {info} because it already has median", false);
+                    Log.Info($"Skipping {info} because it already has median", false);
                     continue;
                 }
 
                 if (!GetAshphaltOffset(info, out float voffset)) {
                     if (float.IsNaN(voffset))
-                        Log.Debug($"Skipping {info} because it has no car lanes. voffset={voffset}", false);
+                        Log.Info($"Skipping {info} because it has no car lanes. voffset={voffset}", false);
                     else
-                        Log.Debug($"Skipping {info} because it has lanes at different vertical offset. voffset={voffset}", false);
+                        Log.Info($"Skipping {info} because it has lanes at different vertical offset. voffset={voffset}", false);
                     continue;
                 }
 
                 if (info.IsAdaptive()) {
-                    Log.Debug($"Skipping {info} because it belongs to the adaptive roads mod", false);
+                    Log.Info($"Skipping {info} because it belongs to the adaptive roads mod", false);
                     continue;
                 }
 
                 if (!API.InvokeShouldManageDCNodes(info, 0, 0)) {
-                    Log.Debug($"Skipping {info} because InvokeShouldManageDCNodes() returned false", false);
+                    Log.Info($"Skipping {info} because InvokeShouldManageDCNodes() returned false", false);
                     continue;
                 }
 
