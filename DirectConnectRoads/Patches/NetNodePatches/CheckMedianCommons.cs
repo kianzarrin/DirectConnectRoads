@@ -80,7 +80,7 @@ namespace DirectConnectRoads.Patches {
         static MethodInfo mCheckRenderDistance => typeof(RenderManager.CameraInfo).GetMethod("CheckRenderDistance");
         static FieldInfo f_m_nodes => typeof(NetInfo).GetField("m_nodes");
 
-        public static void ApplyCheckMedian(List<CodeInstruction> codes, MethodInfo method, int occurance) {
+        public static void ApplyCheckMedian(List<CodeInstruction> codes, MethodBase method, int occurance) {
             Assertion.Assert(mCheckRenderDistance != null, "mCheckRenderDistance!=null failed");
             Assertion.Assert(mShouldConnectMedian != null, "mShouldConnectMedian!=null failed");
             /*

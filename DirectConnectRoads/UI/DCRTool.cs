@@ -20,8 +20,9 @@ namespace DirectConnectRoads.UI {
         protected override void Awake() {
             try {
                 base.Awake();
+                Log.Called();
                 string sprites = UUIHelpers.GetFullPath<LifeCycle.Mod>("uui_cjm_dcr.png");
-                Debug.Log("[UUIExampleMod] ExampleTool.Awake() sprites=" + sprites);
+                Log.Info("sprites=" + sprites);
                 button_ = UUIHelpers.RegisterToolButton(
                     name: "DirectConnectRoad",
                     groupName: null, // default group
@@ -29,8 +30,7 @@ namespace DirectConnectRoads.UI {
                     spritefile: sprites,
                     tool: this);
             } catch (Exception ex) {
-                Debug.LogException(ex);
-                UIView.ForwardException(ex);
+                ex.Log();
             }
         }
 
