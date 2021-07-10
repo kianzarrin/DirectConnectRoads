@@ -8,13 +8,14 @@ using System.Collections.Generic;
 using TrafficManager.Manager.Impl;
 using UnityEngine;
 using static KianCommons.Math.MathUtil;
+using static KianCommons.ReflectionHelpers;
 
 namespace DirectConnectRoads.Util {
     public static class NetInfoUtil {
         //public const float ASPHALT_HEIGHT = RoadMeshUtil.ASPHALT_HEIGHT;
         [Obsolete]
         public static void UpdateAllNodes() {
-            Log.Info("UpdateAllNodes() called ...", true);
+            Log.Called();
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().Info.m_requireDirectRenderers) continue;
@@ -24,7 +25,7 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void UpdateAllNetworkRenderers() {
-            Log.Info("UpdateAllNetworkRenderers() called ...", true);
+            Log.Called();
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
@@ -36,7 +37,7 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void FastUpdateAllNetworks() {
-            Log.Info("FastUpdateAllNetworks() called ...", true);
+            Log.Called();
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
@@ -206,9 +207,14 @@ namespace DirectConnectRoads.Util {
         }
 
         // must be called before FixMaxTurnAngles()
-        public static void LoadDCTextures() {
+        public static void GenerateDCTextures() {
             AddedNodes = new HashSet<NetInfo.Node>();
-            Log.Info("LoadDCTextures() called");
+            if (!DCRConfig.Config.GenerateMedians) {
+                Log.Info($"skipping {ThisMethod} because GenerateMedians={DCRConfig.Config.GenerateMedians}");
+                return;
+            }
+
+            Log.Called();
             foreach (NetInfo info in IterateRoadPrefabs()) {
                 if (info == null || info.m_nodes.Length == 0)
                     continue;
@@ -346,6 +352,11 @@ namespace DirectConnectRoads.Util {
 
         public static Hashtable OriginalTurnAngles = new Hashtable();
         public static void FixMaxTurnAngles() {
+            if(!DCRConfig.Config.RemoveDCRestrictionsAngle) {
+                Log.Info($"skipping {ThisMethod} because RemoveDCRestrictionsAngle={DCRConfig.Config.RemoveDCRestrictionsAngle}");
+                return;
+            }
+
             int loadedCount = PrefabCollection<NetInfo>.LoadedCount();
             for (uint i = 0; i < loadedCount; ++i) {
                 try {
@@ -406,7 +417,11 @@ namespace DirectConnectRoads.Util {
                         bool isMedian = DCUtil.IsMedian(nodeInfo: nodeInfo, netInfo: netInfo);
                         if (!isMedian) continue;
 
-                        var flags = nodeInfo.m_flagsForbidden & ~(NetNode.Flags.Transition | NetNode.Flags.TrafficLights);
+                        var flags = nodeInfo.m_flagsForbidden;
+                        if (DCRConfig.Config.RemoveDCRestrictionsTransition)
+                            flags &= ~NetNode.Flags.Transition;
+                        if (DCRConfig.Config.RemoveDCRestrictionsTL)
+                            flags &= ~NetNode.Flags.TrafficLights;
                         if (nodeInfo.m_flagsForbidden != flags) {
                             OriginalForbiddenFalgs[nodeInfo] = nodeInfo.m_flagsForbidden;
                             nodeInfo.m_flagsForbidden = flags;

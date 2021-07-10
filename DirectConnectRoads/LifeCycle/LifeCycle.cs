@@ -63,7 +63,7 @@ namespace DirectConnectRoads.LifeCycle {
             try {
                 LogCalled();
                 if (!Loaded) {
-                    NetInfoUtil.LoadDCTextures();
+                    NetInfoUtil.GenerateDCTextures();
                     NetInfoUtil.FixMaxTurnAngles();
                     NetInfoUtil.FixDCFlags();
                 }

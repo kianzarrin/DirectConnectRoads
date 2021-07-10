@@ -1,4 +1,4 @@
-﻿namespace DirectConnectRoads {
+namespace DirectConnectRoads {
     using System.IO;
     using System;
     using System.Xml.Serialization;
@@ -7,11 +7,15 @@
     using System.Collections.Generic;
 
     public class DCRConfig {
+        public List<string> Exemptions = new List<string>();
+        public bool GenerateMedians = true;
+        public bool RemoveDCRestrictionsAngle = true;
+        public bool RemoveDCRestrictionsTL = true;
+        public bool RemoveDCRestrictionsTransition = true;
+
         public const string FILE_NAME = "DCRConfig.xml";
         public static string FilePath => Path.Combine(DataLocation.localApplicationData, FILE_NAME);
         static XmlSerializer ser_ => new XmlSerializer(typeof(DCRConfig));
-
-        public List<string> Exemptions = new List<string>();
 
         static DCRConfig config_;
         static public DCRConfig Config => config_ ??= Deserialize() ?? new DCRConfig();

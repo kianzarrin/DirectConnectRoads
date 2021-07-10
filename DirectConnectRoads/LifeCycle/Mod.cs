@@ -1,15 +1,10 @@
-namespace DirectConnectRoads.LifeCycle
-{
+namespace DirectConnectRoads.LifeCycle {
     using System;
     using JetBrains.Annotations;
     using ICities;
-    using CitiesHarmony.API;
-    using KianCommons;
-    using Util;
-    using ColossalFramework.UI;
-
-    public class Mod : IUserMod
-    {
+    using KianCommons.IImplict;
+    
+    public class Mod : IUserMod, IMod, IModWithSettings {
         public static Version ModVersion => typeof(Mod).Assembly.GetName().Version;
         public static string VersionString => ModVersion.ToString(2);
         public string Name => "Direct Connect Roads V"+ VersionString;
@@ -30,10 +25,6 @@ namespace DirectConnectRoads.LifeCycle
             IsEnabled = false;
         }
 
-        public void OnSettingsUI(UIHelperBase helper) {
-            UIButton button = helper.AddButton("Refresh all junctions (Resolve blue clippings)", RefreshNetworks) as UIButton;
-            void RefreshNetworks() => SimulationManager.instance.AddAction(NetInfoUtil.FullUpdateAllNetworks);
-            button.tooltip = "might take a while";
-        }
+        public void OnSettingsUI(UIHelper helper) => DCRSettings.OnSettingsUI(helper);
     }
 }
