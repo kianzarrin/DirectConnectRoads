@@ -9,6 +9,7 @@ using TrafficManager.Manager.Impl;
 using UnityEngine;
 using static KianCommons.Math.MathUtil;
 using static KianCommons.ReflectionHelpers;
+using HarmonyLib;
 
 namespace DirectConnectRoads.Util {
     public static class NetInfoUtil {
@@ -56,7 +57,7 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void FullUpdateAllNetworks() {
-            Log.Info("FullUpdateAllNetworks() called ...", true);
+            Log.Called();
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
@@ -66,13 +67,15 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void UpdateAllNodeRenderers() {
-            Log.Info("FullUpdateAllNetworks() called ...", true);
-            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
-                if (!NetUtil.IsNodeValid(nodeID)) continue;
-                if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
-                //Log.Debug("updating node:"+ nodeID);
-                NetManager.instance.UpdateNode(nodeID);
-            }
+            try {
+                Log.Called();
+                for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
+                    if (!NetUtil.IsNodeValid(nodeID)) continue;
+                    if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
+                    //Log.Debug("updating node:"+ nodeID);
+                    NetManager.instance.UpdateNode(nodeID);
+                }
+            } catch(Exception ex) { ex.Log(); }
         }
 
 
@@ -92,14 +95,14 @@ namespace DirectConnectRoads.Util {
         public static IEnumerable<NetInfo> IterateRoadPrefabs() {
             int prefabCount = PrefabCollection<NetInfo>.PrefabCount();
             int loadedCount = PrefabCollection<NetInfo>.LoadedCount();
-            Log.Info($"IterateRoadPrefabs: prefabCount={prefabCount} LoadedCount={loadedCount}");
+            //Log.Debug($"IterateRoadPrefabs: prefabCount={prefabCount} LoadedCount={loadedCount}",false);
             for (uint i = 0; i < loadedCount; ++i) {
                 NetInfo info = PrefabCollection<NetInfo>.GetLoaded(i);
                 if (!info) {
-                    Log.Error("Warning:Skipping Bad prefab with null info");
+                    Log.Warning("Skipping Bad prefab with null info");
                     continue;
                 } else if (info.m_netAI == null) {
-                    Log.Error("Warning:Skipping Bad prefab with null info.m_NetAI");
+                    Log.Warning("Skipping Bad prefab with null info.m_NetAI");
                     continue;
                 }
                 if (!(info.m_netAI is RoadBaseAI))
@@ -301,15 +304,15 @@ namespace DirectConnectRoads.Util {
         public static HashSet<NetInfo.Node> AddedNodes;
 
         public static void UnloadDCTextures() {
+            Log.Called();
             foreach (NetInfo info in IterateRoadPrefabs())
                 RemoveDCTextures(info);
         }
 
         public static void RemoveDCTextures(NetInfo netInfo) {
             var node = netInfo.m_nodes[netInfo.m_nodes.Length - 1];
-            if (AddedNodes.Contains(node)) {
+            if (AddedNodes.Contains(node))
                 netInfo.m_nodes = NodeInfoUtil.RemoveNode(netInfo.m_nodes, node);
-            }
         }
 
 #if OLDCODE
@@ -357,6 +360,7 @@ namespace DirectConnectRoads.Util {
                 return;
             }
 
+            Log.Called();
             int loadedCount = PrefabCollection<NetInfo>.LoadedCount();
             for (uint i = 0; i < loadedCount; ++i) {
                 try {
@@ -387,6 +391,7 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void RestoreMaxTurnAngles() {
+            Log.Called();
             foreach (var item in OriginalTurnAngles.Keys) {
                 NetInfo info = item as NetInfo;
                 if (info == null) {
@@ -407,6 +412,7 @@ namespace DirectConnectRoads.Util {
         #region fix flags
         public static Hashtable OriginalForbiddenFalgs = new Hashtable();
         public static void FixDCFlags() {
+            Log.Called();
             int loadedCount = PrefabCollection<NetInfo>.LoadedCount();
             for (uint i = 0; i < loadedCount; ++i) {
                 try {
@@ -434,6 +440,7 @@ namespace DirectConnectRoads.Util {
         }
 
         public static void RestoreFlags() {
+            Log.Called();
             foreach (var key in OriginalForbiddenFalgs.Keys) {
                 try {
                     Assertion.AssertNotNull(key is NetInfo.Node, "key is NetInfo.Node");

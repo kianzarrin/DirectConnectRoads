@@ -4,6 +4,7 @@ namespace DirectConnectRoads {
     using DirectConnectRoads.Util;
     using System.Collections.Generic;
     using UnityEngine;
+    using System.Linq;
 
     // [Serializable]
     public static class NodeInfoUtil{
