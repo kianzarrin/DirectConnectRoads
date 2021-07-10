@@ -92,7 +92,7 @@ namespace DirectConnectRoads.LifeCycle {
                 g.AddToggle(
                     text: "Remove Traffic light restrictions",
                     tooltip: "Removes the traffic light requirement for roads that already have a continues junction median.",
-                    fieldName: nameof(DCRConfig.RemoveDCRestrictionsTransition),
+                    fieldName: nameof(DCRConfig.RemoveDCRestrictionsTL),
                     OnRefresh: RefreshDCFlags);
                 g.AddToggle(
                     text: "Remove 'Transition' restrictions",
