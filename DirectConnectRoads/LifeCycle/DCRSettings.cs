@@ -74,7 +74,7 @@ namespace DirectConnectRoads.LifeCycle {
             });
         }
 
-        static void RefreshNetworks() => SimulationManager.instance.AddAction(NetInfoUtil.FullUpdateAllNetworks);
+        static void RefreshNetworks() => SimulationManager.instance.AddAction(NetInfoUtil.FullUpdateAllRoadJunctions);
 
         public static void OnSettingsUI(UIHelper helper) {
             {
@@ -102,7 +102,7 @@ namespace DirectConnectRoads.LifeCycle {
             }
             {
                 var g2 = helper.AddGroup("Debug");
-                g2.AddButton("Refresh all junctions (Resolve blue clippings)", "might take a while", RefreshNetworks);
+                g2.AddButton("Refresh all road junctions (Resolve blue clippings)", "might take a while", RefreshNetworks);
                 g2.AddButton("Regenerate meshes", "might take a while", RefreshDC);
             }
 

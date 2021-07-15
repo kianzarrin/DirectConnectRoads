@@ -37,11 +37,12 @@ namespace DirectConnectRoads.Util {
             }
         }
 
-        public static void FastUpdateAllNetworks() {
+        public static void FastUpdateAllRoadJunctions() {
             Log.Called();
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
+                if (!nodeID.ToNode().Info.IsRoad()) continue;
 
                 nodeID.ToNode().UpdateNode(nodeID);
                 NetManager.instance.UpdateNodeFlags(nodeID);
@@ -56,12 +57,12 @@ namespace DirectConnectRoads.Util {
             }
         }
 
-        public static void FullUpdateAllNetworks() {
+        public static void FullUpdateAllRoadJunctions() {
             Log.Called();
             for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                 if (!NetUtil.IsNodeValid(nodeID)) continue;
                 if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
-                //Log.Debug("updating node:"+ nodeID);
+                if (!nodeID.ToNode().Info.IsRoad()) continue;
                 NetManager.instance.UpdateNode(nodeID);
             }
         }
@@ -71,9 +72,9 @@ namespace DirectConnectRoads.Util {
                 Log.Called();
                 for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
                     if (!NetUtil.IsNodeValid(nodeID)) continue;
+                    if (!nodeID.ToNode().Info.IsRoad()) continue;
                     if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
-                    //Log.Debug("updating node:"+ nodeID);
-                    NetManager.instance.UpdateNode(nodeID);
+                    NetManager.instance.UpdateNodeRenderer(nodeID, true);
                 }
             } catch(Exception ex) { ex.Log(); }
         }
@@ -81,15 +82,10 @@ namespace DirectConnectRoads.Util {
 
         #region Textures
         public static NetInfo GetInfo(string name) {
-            int count = PrefabCollection<NetInfo>.LoadedCount();
-            for (uint i = 0; i < count; ++i) {
-                NetInfo info = PrefabCollection<NetInfo>.GetLoaded(i);
-                if (info.name == name)
-                    return info;
-                //Helpers.Log(info.name);
-            }
-            Log.Error("NetInfo not found!");
-            return null;
+            var ret = PrefabCollection<NetInfo>.FindLoaded(name);
+            if (ret is null)
+                Log.Warning($"NetInfo '{name}' not found!");
+            return ret;
         }
 
         public static IEnumerable<NetInfo> IterateRoadPrefabs() {
@@ -361,17 +357,8 @@ namespace DirectConnectRoads.Util {
             }
 
             Log.Called();
-            int loadedCount = PrefabCollection<NetInfo>.LoadedCount();
-            for (uint i = 0; i < loadedCount; ++i) {
+            foreach(NetInfo netInfo in IterateRoadPrefabs()) {
                 try {
-                    NetInfo netInfo = PrefabCollection<NetInfo>.GetLoaded(i);
-                    if (netInfo == null) {
-                        Log.Error("Warning:Bad prefab with null info");
-                        continue;
-                    } else if (netInfo.m_netAI == null) {
-                        Log.Error("Warning:Bad prefab with null info.m_NetAI");
-                        continue;
-                    }
                     if (netInfo.m_connectGroup == NetInfo.ConnectGroup.None)
                         continue;
                     bool hasTracks = false;
@@ -413,10 +400,8 @@ namespace DirectConnectRoads.Util {
         public static Hashtable OriginalForbiddenFalgs = new Hashtable();
         public static void FixDCFlags() {
             Log.Called();
-            int loadedCount = PrefabCollection<NetInfo>.LoadedCount();
-            for (uint i = 0; i < loadedCount; ++i) {
+            foreach (NetInfo netInfo in IterateRoadPrefabs()) {
                 try {
-                    NetInfo netInfo = PrefabCollection<NetInfo>.GetLoaded(i);
                     if (netInfo?.m_netAI == null || netInfo.m_nodes == null) continue;
                     foreach (var nodeInfo in netInfo.m_nodes) {
                         if (!nodeInfo.m_directConnect) continue;
