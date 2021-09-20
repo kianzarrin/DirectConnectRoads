@@ -257,6 +257,11 @@ namespace DirectConnectRoads.Util {
                     continue;
                 }
 
+                if (info.IsCSUR()) {
+                    Log.Info($"Skipping {info} because its CSUR", false);
+                    continue;
+                }
+
                 AddDCTextures(info, voffset);
             } // end for
         }
