@@ -12,6 +12,7 @@ namespace DirectConnectRoads {
         public bool RemoveDCRestrictionsAngle = true;
         public bool RemoveDCRestrictionsTL = true;
         public bool RemoveDCRestrictionsTransition = true;
+        public bool RefreshOnStartup = false;
 
         public const string FILE_NAME = "DCRConfig.xml";
         public static string FilePath => Path.Combine(DataLocation.localApplicationData, FILE_NAME);

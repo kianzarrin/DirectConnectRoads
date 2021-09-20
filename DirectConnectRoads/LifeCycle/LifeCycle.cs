@@ -66,6 +66,8 @@ namespace DirectConnectRoads.LifeCycle {
                     NetInfoUtil.GenerateDCTextures();
                     NetInfoUtil.FixMaxTurnAngles();
                     NetInfoUtil.FixDCFlags();
+                    if (DCRConfig.Config.RefreshOnStartup)
+                        DCRSettings.RefreshNetworks();
                 }
 
                 Loaded = true;
@@ -78,10 +80,6 @@ namespace DirectConnectRoads.LifeCycle {
         public static void AfterLoad() {
             LogCalled();
             SimulationManager.instance.AddAction(delegate () {
-                // TODO: which line to uncomment:
-                // NetInfoUtil.UpdateAllNetworkRenderers();
-                // NetInfoUtil.FastUpdateAllNetworks();
-                // NetInfoUtil.FullUpdateAllNetworks();
                 NetInfoUtil.UpdateAllNodeRenderers();
             });
             UI.DCRTool.Create();
