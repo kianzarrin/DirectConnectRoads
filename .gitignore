@@ -349,3 +349,4 @@ MigrationBackup/
 .ionide/
 *.config
 
+/dependencies
