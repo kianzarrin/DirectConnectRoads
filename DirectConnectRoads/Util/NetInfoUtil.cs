@@ -2,17 +2,18 @@ using ColossalFramework;
 using KianCommons;
 using KianCommons.Plugins;
 using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using TrafficManager.Manager.Impl;
+using TrafficManager.API.Manager;
 using UnityEngine;
 using static KianCommons.Math.MathUtil;
 using static KianCommons.ReflectionHelpers;
-using HarmonyLib;
 
 namespace DirectConnectRoads.Util {
     public static class NetInfoUtil {
+        static IManagerFactory TMPE => TrafficManager.API.Implementations.ManagerFactory;
+        static ILaneArrowManager LaneArrowManager => TMPE.LaneArrowManager;
+
         //public const float ASPHALT_HEIGHT = RoadMeshUtil.ASPHALT_HEIGHT;
         [Obsolete]
         public static void UpdateAllNodes() {
@@ -274,8 +275,8 @@ namespace DirectConnectRoads.Util {
         public static bool GetAshphaltOffset(this NetInfo info, out float offset) {
             offset = float.NaN;
             foreach (var lane in info.m_lanes) {
-                bool isCarLane = lane.m_vehicleType.IsFlagSet(LaneArrowManager.VEHICLE_TYPES) &&
-                                 lane.m_laneType.IsFlagSet(LaneArrowManager.LANE_TYPES);
+                bool isCarLane = lane.m_vehicleType.IsFlagSet(LaneArrowManager.VehicleTypes) &&
+                                 lane.m_laneType.IsFlagSet(LaneArrowManager.LaneTypes);
                 if (!isCarLane)
                     continue;
                 if (float.IsNaN(offset))

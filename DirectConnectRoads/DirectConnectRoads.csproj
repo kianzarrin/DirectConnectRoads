@@ -3,7 +3,7 @@
     <TargetFramework>net35</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Deterministic>false</Deterministic>
-    <AssemblyVersion>2.4.13.*</AssemblyVersion>
+    <AssemblyVersion>2.4.14.*</AssemblyVersion>
     <LangVersion>preview</LangVersion>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -32,23 +32,6 @@
     <ContentPath>$(SteamPath)/steamapps/workshop/content/255710/$(ContentID)</ContentPath>
     <DefineConstants />
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="KianCommons\KianCommons\Backport\**" />
-    <Compile Remove="KianCommons\KianCommons\obj\**" />
-    <Compile Remove="KianCommons\KianCommons\StockCode\**" />
-    <Compile Remove="KianCommons\KianCommons\UI\Table\**" />
-    <Compile Remove="KianCommons\libs\**" />
-    <EmbeddedResource Remove="KianCommons\KianCommons\Backport\**" />
-    <EmbeddedResource Remove="KianCommons\KianCommons\obj\**" />
-    <EmbeddedResource Remove="KianCommons\KianCommons\StockCode\**" />
-    <EmbeddedResource Remove="KianCommons\KianCommons\UI\Table\**" />
-    <EmbeddedResource Remove="KianCommons\libs\**" />
-    <None Remove="KianCommons\KianCommons\Backport\**" />
-    <None Remove="KianCommons\KianCommons\obj\**" />
-    <None Remove="KianCommons\KianCommons\StockCode\**" />
-    <None Remove="KianCommons\KianCommons\UI\Table\**" />
-    <None Remove="KianCommons\libs\**" />
-  </ItemGroup>
   <ItemDefinitionGroup>
     <Reference>
       <Private>False</Private>
@@ -70,11 +53,27 @@
     <Reference Include="UnityEngine.UI" />
     <Reference Include="CSUtil.Commons" />
     <Reference Include="TMPE.API" />
-    <Reference Include="TrafficManager" />
     <Reference Include="UnifiedUILib">
       <Private>true</Private>
       <Aliases>UUILib</Aliases>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="KianCommons\KianCommons\Backport\**" />
+    <Compile Remove="KianCommons\KianCommons\obj\**" />
+    <Compile Remove="KianCommons\KianCommons\StockCode\**" />
+    <Compile Remove="KianCommons\KianCommons\UI\Table\**" />
+    <Compile Remove="KianCommons\libs\**" />
+    <EmbeddedResource Remove="KianCommons\KianCommons\Backport\**" />
+    <EmbeddedResource Remove="KianCommons\KianCommons\obj\**" />
+    <EmbeddedResource Remove="KianCommons\KianCommons\StockCode\**" />
+    <EmbeddedResource Remove="KianCommons\KianCommons\UI\Table\**" />
+    <EmbeddedResource Remove="KianCommons\libs\**" />
+    <None Remove="KianCommons\KianCommons\Backport\**" />
+    <None Remove="KianCommons\KianCommons\obj\**" />
+    <None Remove="KianCommons\KianCommons\StockCode\**" />
+    <None Remove="KianCommons\KianCommons\UI\Table\**" />
+    <None Remove="KianCommons\libs\**" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="KianCommons\KianCommons\LifeCycleBase.cs" />

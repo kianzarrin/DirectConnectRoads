@@ -3,11 +3,13 @@ namespace DirectConnectRoads.Util {
     using KianCommons;
     using KianCommons.Math;
     using TrafficManager.API.Traffic.Enums;
-    using TrafficManager.Manager.Impl;
+    using TrafficManager.API.Manager;
     using UnityEngine;
     using VectorUtil = KianCommons.Math.VectorUtil;
 
     public static class DirectConnectUtil {
+        static IManagerFactory TMPE => TrafficManager.API.Implementations.ManagerFactory;
+
         #region Broken Median detection
         public static bool OpenMedian(ushort segmentID1, ushort segmentID2) {
             ushort nodeID = segmentID1.ToSegment().GetSharedNode(segmentID2);
@@ -73,25 +75,25 @@ namespace DirectConnectRoads.Util {
         public static bool DoesSegmentGoToSegment(ushort sourceSegmentID, ushort targetSegmentID, ushort nodeID) {
             bool startNode = NetUtil.IsStartNode(sourceSegmentID, nodeID);
             if (sourceSegmentID == targetSegmentID) {
-                return JunctionRestrictionsManager.Instance.IsUturnAllowed(sourceSegmentID, startNode);
+                return TMPE.JunctionRestrictionsManager.IsUturnAllowed(sourceSegmentID, startNode);
             }
-            ArrowDirection arrowDir = ExtSegmentEndManager.Instance.GetDirection(sourceSegmentID, targetSegmentID, nodeID);
+            ArrowDirection arrowDir = TMPE.ExtSegmentEndManager.GetDirection(sourceSegmentID, targetSegmentID, nodeID);
             LaneArrows arrow = ArrowDir2LaneArrows(arrowDir);
             var sourceLanes = new LaneDataIterator(
                 sourceSegmentID,
                 startNode,
-                LaneArrowManager.LANE_TYPES,
-                LaneArrowManager.VEHICLE_TYPES);
+                TMPE.LaneArrowManager.LaneTypes,
+                TMPE.LaneArrowManager.VehicleTypes);
             //Log.Debug("DoesSegmentGoToSegment: sourceLanes=" + sourceLanes.ToSTR());
 
             foreach (LaneData sourceLane in sourceLanes) {
                 bool connected;
-                if (LaneConnectionManager.Instance.HasConnections(sourceLane.LaneID, startNode)) {
+                if (TMPE.LaneConnectionManager.HasConnections(sourceLane.LaneID, startNode)) {
                     connected = IsLaneConnectedToSegment(sourceLane.LaneID, targetSegmentID);
                     //Log.Debug($"IsLaneConnectedToSegment({sourceLane},{targetSegmentID}) = {connected}");
 
                 } else {
-                    LaneArrows arrows = LaneArrowManager.Instance.GetFinalLaneArrows(sourceLane.LaneID);
+                    LaneArrows arrows = TMPE.LaneArrowManager.GetFinalLaneArrows(sourceLane.LaneID);
                     connected = (arrows & arrow) != 0;
                 }
                 if (connected)
@@ -113,10 +115,10 @@ namespace DirectConnectRoads.Util {
             var targetLanes = new LaneDataIterator(
                 targetSegmentID,
                 !targetStartNode,// going away from start node.
-                LaneConnectionManager.LANE_TYPES,
-                LaneConnectionManager.VEHICLE_TYPES);
+                TMPE.LaneConnectionManager.LaneTypes,
+                TMPE.LaneConnectionManager.VehicleTypes);
             foreach (LaneData targetLane in targetLanes) {
-                if (LaneConnectionManager.Instance.AreLanesConnected(sourceLaneId, targetLane.LaneID, sourceStartNode))
+                if (TMPE.LaneConnectionManager.AreLanesConnected(sourceLaneId, targetLane.LaneID, sourceStartNode))
                     return true;
             }
             return false;
