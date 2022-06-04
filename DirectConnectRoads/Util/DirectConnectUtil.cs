@@ -94,7 +94,9 @@ namespace DirectConnectRoads.Util {
         /// Determines if there is any lane connection from source lane to target segment.
         /// </summary>
         public static bool IsLaneConnectedToSegment(uint sourceLaneId, ushort targetSegmentID, bool startNode) {
-            foreach (var transition in GetForwardRoutings(sourceLaneId, startNode)) {
+            var transitions = GetForwardRoutings(sourceLaneId, startNode);
+            if (transitions == null) return false;
+            foreach (var transition in transitions) {
                 if (transition.type is LaneEndTransitionType.Invalid or LaneEndTransitionType.Relaxed)
                     continue;
 
@@ -106,8 +108,6 @@ namespace DirectConnectRoads.Util {
             }
             return false;
         }
-
-
         #endregion
 
         #region Geometry
