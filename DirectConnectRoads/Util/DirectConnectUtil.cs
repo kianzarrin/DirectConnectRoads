@@ -49,7 +49,7 @@ namespace DirectConnectRoads.Util {
         }
         #endregion
 
-        #region segment 2 segment connections
+        #region connections
         /// <summary>
         /// returns a list of all segments sourceSegmentID is connected to including itself
         /// if uturn is allowed.
