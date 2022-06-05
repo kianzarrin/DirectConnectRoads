@@ -91,7 +91,7 @@ namespace DirectConnectRoads.Util {
             left = right = float.NaN;
 
             var crossSection = mesh.CrossSection().ToArray();
-            Log.Debug($"cross section for mesh:{mesh} is " + crossSection.ToSTR("f4"),false);
+            Log.Debug($"cross section for mesh:{mesh} is " + crossSection.ToSTR<Vector2>("f4"),false);
 
             for (int i = 1; i <= crossSection.Length / 2; ++i) {
                 //Log.Debug("assesing vertex " + crossSection[i].ToString("e"),false);
