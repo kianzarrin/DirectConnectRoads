@@ -124,7 +124,7 @@ namespace DirectConnectRoads.Util {
         /// or if tracks are too far apart.
         /// </summary>
         public static bool UnsupportedRoadWithTrack(NetInfo info) {
-            if (info.IsAdaptive())
+            if (info.GetIsAdaptive())
                 return false; // handled else where.
 
             //Log.Debug($"UnsupportedRoadWithTrack({info.name}) called", false);
@@ -248,7 +248,7 @@ namespace DirectConnectRoads.Util {
                     continue;
                 }
 
-                if (info.IsAdaptive()) {
+                if (info.GetIsAdaptive()) {
                     Log.Info($"Skipping {info} because it belongs to the adaptive roads mod", false);
                     continue;
                 }

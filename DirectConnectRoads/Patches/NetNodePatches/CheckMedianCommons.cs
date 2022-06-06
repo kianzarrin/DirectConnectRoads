@@ -29,7 +29,7 @@ namespace DirectConnectRoads.Patches {
                     return true; // ignore.
                 }
 
-                if (info.IsAdaptive()) {
+                if (info.GetIsAdaptive()) {
                     if (!nodeInfo.HideBrokenARMedians())
                         return true; // ignore
                 } else {
