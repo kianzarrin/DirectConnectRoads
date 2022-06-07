@@ -5,9 +5,16 @@ namespace DirectConnectRoads {
     using ColossalFramework.IO;
     using KianCommons;
     using System.Collections.Generic;
+    using System.Xml.Serialization;
+    using System.Linq;
 
     public class DCRConfig {
-        public List<string> Exemptions = new List<string>();
+        [XmlIgnore] internal HashSet<string> ExemptionsSet = new ();
+        public string[] Exemptions {
+            get => ExemptionsSet.ToArray();
+            set => ExemptionsSet = new(value);
+        }
+
         public bool GenerateMedians = true;
         public bool RemoveDCRestrictionsAngle = true;
         public bool RemoveDCRestrictionsTL = true;

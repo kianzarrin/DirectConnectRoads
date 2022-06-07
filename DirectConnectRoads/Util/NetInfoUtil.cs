@@ -174,15 +174,18 @@ namespace DirectConnectRoads.Util {
 
         public static bool IsRoad(this NetInfo info) => info.m_netAI is RoadBaseAI;
 
-        public static bool IsNormalSymetricalTwoWay(this NetInfo info) {
+        public static bool IsNormalSymetricalTwoWay(this NetInfo info, out int pedestrianLanes) {
             bool ret = info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount && info.m_hasBackwardVehicleLanes;
-            if (!ret)
+            pedestrianLanes = -1;
+            if (!ret) {
+                //Log.Debug($"info: {info.m_forwardVehicleLaneCount} {info.m_backwardVehicleLaneCount}");
                 return false;
+            }
 
             int forwardbikeLanes = 0;
             int backwardbikeLanes = 0;
             int parkingLanes = 0;
-            int pedestrianLanes = 0;
+            pedestrianLanes = 0;
             foreach (var lane in info.m_lanes) {
                 if (lane.m_laneType == NetInfo.LaneType.Pedestrian) {
                     pedestrianLanes++;
@@ -197,12 +200,14 @@ namespace DirectConnectRoads.Util {
                         return false;
                 }
             }
-            if (forwardbikeLanes != backwardbikeLanes)
+            if (forwardbikeLanes != backwardbikeLanes) {
+                //Log.Debug($"info: {forwardbikeLanes} {backwardbikeLanes}");
                 return false;
-            if (parkingLanes != 2 && parkingLanes != 0)
+            }
+            if (parkingLanes % 2 != 0 && parkingLanes != 0) {
+                //Log.Debug($"info: {parkingLanes} {parkingLanes}");
                 return false;
-            if (pedestrianLanes != 2 && pedestrianLanes != 0)
-                return false;
+            }
             return true;
         }
 
@@ -220,7 +225,7 @@ namespace DirectConnectRoads.Util {
                     continue;
                 if (!info.IsRoad())
                     continue;
-                if (!info.IsNormalSymetricalTwoWay()) {
+                if (!info.IsNormalSymetricalTwoWay(out _)) {
                     Log.Info($"Skipping {info} because it is !IsNormalSymetricalTwoWay()", false);
                     continue;
                 }

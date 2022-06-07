@@ -21,5 +21,10 @@ namespace DirectConnectRoads.Util {
             uint routingIndex = RMan.GetLaneEndRoutingIndex(laneID, startNode);
             return RMan.LaneEndForwardRoutings[routingIndex].transitions;
         }
+
+        public static bool HasCrossing(ushort segmentId, ushort nodeId) {
+            bool startNode = segmentId.ToSegment().IsStartNode(nodeId);
+            return JRMan.IsPedestrianCrossingAllowed(segmentId, startNode);
+        }
     }
 }

@@ -57,7 +57,7 @@ namespace DirectConnectRoads.UI {
             var info = GetHoveredNetInfo();
             if (!info) return;
 
-            var excemptions = DCRConfig.Config.Exemptions;
+            var excemptions = DCRConfig.Config.ExemptionsSet;
             if (excemptions.Contains(info.name))
                 excemptions.Remove(info.name);
             else
@@ -71,7 +71,7 @@ namespace DirectConnectRoads.UI {
             var info = GetHoveredNetInfo();
             if (!info) return;
 
-            bool exempt = DCRConfig.Config.Exemptions.Contains(info.name);
+            bool exempt = DCRConfig.Config.ExemptionsSet.Contains(info.name);
             Color color = exempt ? Color.red : Color.green;
             RenderUtil.RenderSegmnetOverlay(cameraInfo, HoveredSegmentID, color);
         }
@@ -84,7 +84,7 @@ namespace DirectConnectRoads.UI {
                 return;
             }
 
-            bool exempt = DCRConfig.Config.Exemptions.Contains(info.name);
+            bool exempt = DCRConfig.Config.ExemptionsSet.Contains(info.name);
             if (!exempt)
                 ShowToolInfo(true, "click to exempt asset from DCR", HitPos);
             else
