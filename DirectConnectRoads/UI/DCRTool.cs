@@ -57,11 +57,10 @@ namespace DirectConnectRoads.UI {
             var info = GetHoveredNetInfo();
             if (!info) return;
 
-            var excemptions = DCRConfig.Config.ExemptionsSet;
-            if (excemptions.Contains(info.name))
-                excemptions.Remove(info.name);
+            if (NetInfoUtil.IsExempt(info))
+                NetInfoUtil.UnExempt(info);
             else
-                excemptions.Add(info.name);
+                NetInfoUtil.Exempt(info);
 
             DCRConfig.Config.Serialize();
         }

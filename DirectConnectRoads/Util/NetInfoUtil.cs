@@ -4,6 +4,7 @@ using KianCommons.Plugins;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TrafficManager.API.Manager;
 using UnityEngine;
 using static KianCommons.Math.MathUtil;
@@ -78,6 +79,20 @@ namespace DirectConnectRoads.Util {
                     NetManager.instance.UpdateNodeRenderer(nodeID, true);
                 }
             } catch(Exception ex) { ex.Log(); }
+        }
+
+        public static void UpdateAllNodeRenderersFor(NetInfo info) {
+            try {
+                Log.Called();
+                for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
+                    ref NetNode node = ref nodeID.ToNode();
+                    if (!NetUtil.IsNodeValid(nodeID)) continue;
+                    if (node.Info.IsRoad()) continue;
+                    if (node.m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
+                    if (node.Info != info) continue;
+                    NetManager.instance.UpdateNodeRenderer(nodeID, true);
+                }
+            } catch (Exception ex) { ex.Log(); }
         }
 
 
@@ -360,7 +375,7 @@ namespace DirectConnectRoads.Util {
             info.m_maxTurnAngleCos = Mathf.Cos(info.m_maxTurnAngle * Mathf.Deg2Rad);
         }
 
-        public static Hashtable OriginalTurnAngles = new Hashtable();
+        public static Dictionary<NetInfo,float> OriginalTurnAngles = new ();
         public static void FixMaxTurnAngles() {
             if(!DCRConfig.Config.RemoveDCRestrictionsAngle) {
                 Log.Info($"skipping {ThisMethod} because RemoveDCRestrictionsAngle={DCRConfig.Config.RemoveDCRestrictionsAngle}");
@@ -369,35 +384,39 @@ namespace DirectConnectRoads.Util {
 
             Log.Called();
             foreach(NetInfo netInfo in IterateRoadPrefabs()) {
-                try {
-                    if (netInfo.m_connectGroup == NetInfo.ConnectGroup.None)
-                        continue;
-                    bool hasTracks = false;
-                    foreach (var nodeInfo in netInfo.m_nodes) {
-                        bool isMedian = DCUtil.IsMedian(nodeInfo: nodeInfo, netInfo: netInfo);
-                        hasTracks = nodeInfo.m_directConnect && !isMedian;
-                    }
-                    if (!hasTracks) {
-                        if (!OriginalTurnAngles.ContainsKey(netInfo))
-                            OriginalTurnAngles[netInfo] = netInfo.m_maxTurnAngle;
-                        netInfo.SetMaxTurnAngle(180);
-                    }
-                } catch (Exception e) {
-                    Log.Error(e.ToString());
+                FixMaxTurnAnglesFor(netInfo);
+            }
+        }
+
+        public static void FixMaxTurnAnglesFor(NetInfo netInfo) {
+            if (!DCRConfig.Config.RemoveDCRestrictionsAngle) {
+                Log.Info($"skipping {ThisMethod} because RemoveDCRestrictionsAngle={DCRConfig.Config.RemoveDCRestrictionsAngle}");
+                return;
+            }
+
+            try {
+                if (netInfo.m_connectGroup == NetInfo.ConnectGroup.None) return;
+                bool hasTracks = false;
+                foreach (var nodeInfo in netInfo.m_nodes) {
+                    bool isMedian = DCUtil.IsMedian(nodeInfo: nodeInfo, netInfo: netInfo);
+                    hasTracks = nodeInfo.m_directConnect && !isMedian;
                 }
-            } // end for            
+                if (!hasTracks) {
+                    if (!OriginalTurnAngles.ContainsKey(netInfo))
+                        OriginalTurnAngles[netInfo] = netInfo.m_maxTurnAngle;
+                    netInfo.SetMaxTurnAngle(180);
+                }
+            } catch (Exception e) {
+                Log.Error(e.ToString());
+            }
         }
 
         public static void RestoreMaxTurnAngles() {
             Log.Called();
-            foreach (var item in OriginalTurnAngles.Keys) {
-                NetInfo info = item as NetInfo;
-                if (info == null) {
-                    Log.Error("info==null item=" + item);
-                    continue;
-                }
+            foreach (var pair in OriginalTurnAngles) {
                 try {
-                    float angle = (float)OriginalTurnAngles[info];
+                    NetInfo info = pair.Key;
+                    float angle = pair.Value;
                     info.SetMaxTurnAngle(angle);
                 } catch (Exception e) {
                     Log.Error(e.Message);
@@ -405,55 +424,116 @@ namespace DirectConnectRoads.Util {
             }
             OriginalTurnAngles.Clear();
         }
+
+        public static void RestoreMaxTurnAnglesFor(NetInfo info) {
+            Log.Called();
+            try {
+                float angle = OriginalTurnAngles[info];
+                info.SetMaxTurnAngle(angle);
+            } catch (Exception e) {
+                Log.Error(e.Message);
+            }
+        }
         #endregion
 
         #region fix flags
-        public static Hashtable OriginalForbiddenFalgs = new Hashtable();
+        public static Dictionary<NetInfo.Node, NetNode.Flags> OriginalForbiddenFalgs = new ();
         public static void FixDCFlags() {
             Log.Called();
+            var excemptions = DCRConfig.Config.ExemptionsSet;
             foreach (NetInfo netInfo in IterateRoadPrefabs()) {
-                try {
-                    if (netInfo?.m_netAI == null || netInfo.m_nodes == null) continue;
-                    foreach (var nodeInfo in netInfo.m_nodes) {
-                        if (!nodeInfo.m_directConnect) continue;
-                        bool isMedian = DCUtil.IsMedian(nodeInfo: nodeInfo, netInfo: netInfo);
-                        if (!isMedian) continue;
+                FixDCFlagsFor(netInfo);
+            }
+        }
+        public static void FixDCFlagsFor(NetInfo netInfo) {
+            Log.Called();
+            var excemptions = DCRConfig.Config.ExemptionsSet;
+            try {
+                if (netInfo?.m_netAI == null || netInfo.m_nodes == null) return;
+                if (excemptions.Contains(netInfo.name)) return;
+                foreach (var nodeInfo in netInfo.m_nodes) {
+                    if (!nodeInfo.m_directConnect) continue;
+                    bool isMedian = DCUtil.IsMedian(nodeInfo: nodeInfo, netInfo: netInfo);
+                    if (!isMedian) continue;
 
-                        var flags = nodeInfo.m_flagsForbidden;
-                        if (DCRConfig.Config.RemoveDCRestrictionsTransition)
-                            flags &= ~NetNode.Flags.Transition;
-                        if (DCRConfig.Config.RemoveDCRestrictionsTL)
-                            flags &= ~NetNode.Flags.TrafficLights;
-                        if (nodeInfo.m_flagsForbidden != flags) {
-                            OriginalForbiddenFalgs[nodeInfo] = nodeInfo.m_flagsForbidden;
-                            nodeInfo.m_flagsForbidden = flags;
-                        }
+                    var flags = nodeInfo.m_flagsForbidden;
+                    if (DCRConfig.Config.RemoveDCRestrictionsTransition)
+                        flags &= ~NetNode.Flags.Transition;
+                    if (DCRConfig.Config.RemoveDCRestrictionsTL)
+                        flags &= ~NetNode.Flags.TrafficLights;
+                    if (nodeInfo.m_flagsForbidden != flags) {
+                        OriginalForbiddenFalgs[nodeInfo] = nodeInfo.m_flagsForbidden;
+                        nodeInfo.m_flagsForbidden = flags;
                     }
-                } catch (Exception e) {
-                    Log.Error(e.ToString());
                 }
-            } // end for            
+            } catch (Exception e) {
+                Log.Error(e.ToString());
+            }
         }
 
         public static void RestoreFlags() {
             Log.Called();
-            foreach (var key in OriginalForbiddenFalgs.Keys) {
-                try {
-                    Assertion.AssertNotNull(key is NetInfo.Node, "key is NetInfo.Node");
-                    Assertion.Assert(key is NetInfo.Node, "key is NetInfo.Node");
-                    NetInfo.Node nodeInfo = key as NetInfo.Node;
-                    Assertion.AssertNotNull(nodeInfo, "item");
-                    var value = OriginalForbiddenFalgs[nodeInfo];
-                    Assertion.Assert(value.GetType() == typeof(NetNode.Flags), $"{value}.type:{value.GetType()}==typeof(NetNode.Flags)");
-                    var flags = (NetNode.Flags)value;
-                    nodeInfo.m_flagsForbidden = flags;
-                } catch (Exception e) {
-                    Log.Error(e.Message);
-                }
+            foreach (var pair in OriginalForbiddenFalgs) {
+                var nodeInfo = pair.Key;
+                var flags = pair.Value;
+                nodeInfo.m_flagsForbidden = flags;
             }
             OriginalForbiddenFalgs.Clear();
         }
+
+        public static void RestoreFlagsFor(NetInfo.Node nodeInfo) {
+            try {
+                Assertion.AssertNotNull(nodeInfo, "item");
+                var flags = OriginalForbiddenFalgs[nodeInfo];
+                nodeInfo.m_flagsForbidden = flags;
+            } catch (Exception e) {
+                Log.Error(e.Message);
+            }
+        }
         #endregion
 
+        public static bool IsExempt(NetInfo netInfo) {
+            var excemptions = DCRConfig.Config.ExemptionsSet;
+            return excemptions.Contains(netInfo.name);
+
+        }
+
+        public static void Exempt(NetInfo netInfo) {
+            try {
+                SimulationManager.instance.ForcedSimulationPaused = true;
+                var excemptions = DCRConfig.Config.ExemptionsSet;
+                excemptions.Add(netInfo.name);
+                foreach (var nodeInfo in netInfo.m_nodes) {
+                    NetInfoUtil.RestoreFlagsFor(nodeInfo);
+                }
+                NetInfoUtil.RestoreMaxTurnAnglesFor(netInfo);
+            } catch (Exception ex) {
+                ex.Log();
+            } finally {
+                SimulationManager.instance.ForcedSimulationPaused = false;
+            }
+
+            SimulationManager.instance.AddAction(delegate () {
+                NetInfoUtil.UpdateAllNodeRenderersFor(netInfo);
+            });
+        }
+
+        public static void UnExempt(NetInfo netInfo) {
+            try {
+                SimulationManager.instance.ForcedSimulationPaused = true;
+                var excemptions = DCRConfig.Config.ExemptionsSet;
+                excemptions.Remove(netInfo.name);
+                NetInfoUtil.FixMaxTurnAnglesFor(netInfo);
+                NetInfoUtil.FixDCFlagsFor(netInfo);
+            } catch (Exception ex) {
+                ex.Log();
+            } finally {
+                SimulationManager.instance.ForcedSimulationPaused = false;
+            }
+
+            SimulationManager.instance.AddAction(delegate () {
+                NetInfoUtil.UpdateAllNodeRenderersFor(netInfo);
+            });
+        }
     }
 }
