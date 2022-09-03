@@ -263,6 +263,8 @@ namespace DirectConnectRoads.Util {
                 if (!GetAshphaltOffset(info, out float voffset)) {
                     if (float.IsNaN(voffset))
                         Log.Info($"Skipping {info} because it has no car lanes. voffset={voffset}", false);
+                    else if(voffset >=0 )
+                        Log.Info($"Skipping {info} because car lanes offset is too high. voffset={voffset}", false);
                     else
                         Log.Info($"Skipping {info} because it has lanes at different vertical offset. voffset={voffset}", false);
                     continue;
@@ -293,18 +295,17 @@ namespace DirectConnectRoads.Util {
         /// </summary>
         /// <param name="offset">vertical offset of the car the car lanes.</param>
         public static bool GetAshphaltOffset(this NetInfo info, out float offset) {
-            offset = float.NaN;
+            offset = info.m_surfaceLevel;
+            if (offset >= 0) {
+                return false;
+            }
             foreach (var lane in info.m_lanes) {
                 bool isCarLane = lane.m_vehicleType.IsFlagSet(LaneArrowManager.VehicleTypes) &&
                                  lane.m_laneType.IsFlagSet(LaneArrowManager.LaneTypes);
-                if (!isCarLane)
-                    continue;
-                if (float.IsNaN(offset))
-                    offset = lane.m_verticalOffset;
-                else if (offset != lane.m_verticalOffset)
+                if (isCarLane && offset != lane.m_verticalOffset)
                     return false;
             }
-            return !float.IsNaN(offset);
+            return true;
         }
 
         public static void AddDCTextures(NetInfo netInfo, float voffset/* = ASPHALT_HEIGHT*/) {
