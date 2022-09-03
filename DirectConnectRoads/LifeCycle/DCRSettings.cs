@@ -47,9 +47,7 @@ namespace DirectConnectRoads.LifeCycle {
                 SimulationManager.instance.ForcedSimulationPaused = false;
             }
 
-            SimulationManager.instance.AddAction(delegate () {
-                NetInfoUtil.UpdateAllNodeRenderers();
-            });
+            SimulationManager.instance.AddAction(NetInfoUtil.UpdateAllNodeRenderers);
         }
 
         static void RefreshDCFlags() {
