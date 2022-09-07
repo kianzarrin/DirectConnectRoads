@@ -193,7 +193,7 @@ namespace DirectConnectRoads.Util {
             bool ret = info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount && info.m_hasBackwardVehicleLanes;
             pedestrianLanes = -1;
             if (!ret) {
-                //Log.Debug($"info: {info.m_forwardVehicleLaneCount} {info.m_backwardVehicleLaneCount}");
+                Log.Debug($"{info}: {info.m_forwardVehicleLaneCount} {info.m_backwardVehicleLaneCount}");
                 return false;
             }
 
@@ -207,20 +207,22 @@ namespace DirectConnectRoads.Util {
                 } else if (lane.m_laneType == NetInfo.LaneType.Parking) {
                     parkingLanes++;
                 } else if (lane.m_vehicleType.IsFlagSet(VehicleInfo.VehicleType.Bicycle)) {
-                    if (lane.m_direction == NetInfo.Direction.Forward)
+                    if (lane.m_direction == NetInfo.Direction.Forward) {
                         forwardbikeLanes++;
-                    if (lane.m_direction == NetInfo.Direction.Backward)
+                    } else if (lane.m_direction == NetInfo.Direction.Backward) {
                         backwardbikeLanes++;
-                    else
+                    } else {
+                        Log.Info($"unexpected bike lane direction: index=[{Array.IndexOf(info.m_lanes, lane)}] " + lane.m_direction);
                         return false;
+                    }
                 }
             }
             if (forwardbikeLanes != backwardbikeLanes) {
-                //Log.Debug($"info: {forwardbikeLanes} {backwardbikeLanes}");
+                Log.Debug($"info: {forwardbikeLanes} {backwardbikeLanes}");
                 return false;
             }
             if (parkingLanes % 2 != 0 && parkingLanes != 0) {
-                //Log.Debug($"info: {parkingLanes} {parkingLanes}");
+                Log.Debug($"info: {parkingLanes} {parkingLanes}");
                 return false;
             }
             return true;
