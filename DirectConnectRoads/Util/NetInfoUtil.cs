@@ -190,8 +190,12 @@ namespace DirectConnectRoads.Util {
         public static bool IsRoad(this NetInfo info) => info.m_netAI is RoadBaseAI;
 
         public static bool IsNormalSymetricalTwoWay(this NetInfo info, out int pedestrianLanes) {
-            bool ret = info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount && info.m_hasBackwardVehicleLanes;
             pedestrianLanes = -1;
+            if (info.m_netAI is PedestrianZoneRoadAI) {
+                Log.Debug($"{info} has PedestrianZoneRoadAI");
+                return false;
+            }
+            bool ret = info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount && info.m_hasBackwardVehicleLanes;
             if (!ret) {
                 Log.Debug($"{info}: {info.m_forwardVehicleLaneCount} {info.m_backwardVehicleLaneCount}");
                 return false;
