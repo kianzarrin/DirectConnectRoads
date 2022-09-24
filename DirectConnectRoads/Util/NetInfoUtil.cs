@@ -189,10 +189,35 @@ namespace DirectConnectRoads.Util {
 
         public static bool IsRoad(this NetInfo info) => info.m_netAI is RoadBaseAI;
 
+
+        struct NormalRoadCacheT {
+            public int PedestrianLanes;
+            public bool Normal;
+        }
+        static Dictionary<NetInfo, NormalRoadCacheT> normalRoadCache_ = new(500);
+
         public static bool IsNormalSymetricalTwoWay(this NetInfo info, out int pedestrianLanes) {
+            if(normalRoadCache_.TryGetValue(info, out NormalRoadCacheT data)){
+                pedestrianLanes = data.PedestrianLanes;
+                return data.Normal;
+            }
+
+            bool normal = IsNormalSymetricalTwoWayImpl(info, out pedestrianLanes);
+            normalRoadCache_[info] = new NormalRoadCacheT {
+                Normal = normal,
+                PedestrianLanes = pedestrianLanes,
+            };
+            return normal;
+        }
+
+        private static bool IsNormalSymetricalTwoWayImpl(this NetInfo info, out int pedestrianLanes) {
             pedestrianLanes = -1;
             if (info.m_netAI is PedestrianZoneRoadAI) {
                 Log.Debug($"{info} has PedestrianZoneRoadAI");
+                return false;
+            }
+            if (info.m_class.name == "Pedestrian Street") {
+                Log.Debug($"{info} is Pedestrian Street");
                 return false;
             }
             bool ret = info.m_forwardVehicleLaneCount == info.m_backwardVehicleLaneCount && info.m_hasBackwardVehicleLanes;
