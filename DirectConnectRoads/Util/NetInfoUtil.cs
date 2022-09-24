@@ -195,6 +195,7 @@ namespace DirectConnectRoads.Util {
             public bool Normal;
         }
         static Dictionary<NetInfo, NormalRoadCacheT> normalRoadCache_ = new(500);
+        public static void Reset() => normalRoadCache_.Clear();
 
         public static bool IsNormalSymetricalTwoWay(this NetInfo info, out int pedestrianLanes) {
             if(normalRoadCache_.TryGetValue(info, out NormalRoadCacheT data)){
