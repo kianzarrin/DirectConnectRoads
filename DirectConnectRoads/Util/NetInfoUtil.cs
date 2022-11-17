@@ -165,9 +165,12 @@ namespace DirectConnectRoads.Util {
             if (tramTracks.Count == 2) {
                 var dist = Mathf.Abs(tramTracks[0].m_position - tramTracks[1].m_position);
 
-                Log.Info($"UnsupportedRoadWithTrack({info.name}) : tram dist = {dist}", false);
-                if (dist > 6.3f) 
+                Log.Info($"UnsupportedRoadWithTrack({info.name}) : connectGroup={info.m_connectGroup} tram dist = {dist}", false);
+                if ((info.m_connectGroup & NetInfo.ConnectGroup.LargeWideTram) == 0 && dist > 6.3f) {
+                    // TODO: is this necessary?
+                    // legacy support. Tram too large without LargeWideTram
                     return true;
+                }
             }
 
             if (trainTracks.Count == 2) {
