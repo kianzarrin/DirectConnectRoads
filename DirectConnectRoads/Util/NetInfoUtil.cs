@@ -1,4 +1,5 @@
 using ColossalFramework;
+using Epic.OnlineServices.Presence;
 using KianCommons;
 using KianCommons.Plugins;
 using System;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TrafficManager.API.Manager;
 using UnityEngine;
+using UnityEngine.Networking.Types;
 using static KianCommons.Math.MathUtil;
 using static KianCommons.ReflectionHelpers;
 
@@ -15,95 +17,41 @@ namespace DirectConnectRoads.Util {
         static IManagerFactory TMPE => TrafficManager.API.Implementations.ManagerFactory;
         static ILaneArrowManager LaneArrowManager => TMPE.LaneArrowManager;
 
-        //public const float ASPHALT_HEIGHT = RoadMeshUtil.ASPHALT_HEIGHT;
-        [Obsolete]
-        public static void UpdateAllNodes() {
+        public static void FastUpdateAllRoadJunctions(NetInfo info = null) {
             Log.Called();
-            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
-                if (!NetUtil.IsNodeValid(nodeID)) continue;
-                if (!nodeID.ToNode().Info.m_requireDirectRenderers) continue;
-                if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
-                NetManager.instance.UpdateNodeRenderer(nodeID, true);
+            foreach (ushort nodeID in GetJunctionRoads(info)) {
+                nodeID.ToNode().CalculateNode(nodeID);
+                //NetManager.instance.UpdateNodeFlags(nodeID);
+                NetManager.instance.UpdateNodeRenderer(nodeID, false);
             }
         }
 
-        public static void UpdateAllNetworkRenderers() {
+        public static void FullUpdateAllRoadJunctions(NetInfo info = null) {
             Log.Called();
-            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
-                if (!NetUtil.IsNodeValid(nodeID)) continue;
-                if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
-                NetManager.instance.UpdateNodeRenderer(nodeID, true);
-                foreach (ushort segmentID in NetUtil.IterateNodeSegments(nodeID)) {
-                    NetManager.instance.UpdateSegmentRenderer(segmentID, true);
-                }
-            }
-        }
-
-        public static void FastUpdateAllRoadJunctions() {
-            Log.Called();
-            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
-                if (!NetUtil.IsNodeValid(nodeID)) continue;
-                if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
-                if (!nodeID.ToNode().Info.IsRoad()) continue;
-
-                nodeID.ToNode().UpdateNode(nodeID);
-                NetManager.instance.UpdateNodeFlags(nodeID);
-                NetManager.instance.UpdateNodeRenderer(nodeID, true);
-
-                foreach (ushort segmentID in NetUtil.IterateNodeSegments(nodeID)) {
-                    segmentID.ToSegment().UpdateSegment(segmentID);
-                    NetManager.instance.UpdateSegmentFlags(segmentID);
-                    NetManager.instance.UpdateSegmentRenderer(segmentID, true);
-
-                }
-            }
-        }
-
-        public static void FullUpdateAllRoadJunctions() {
-            Log.Called();
-            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
-                if (!NetUtil.IsNodeValid(nodeID)) continue;
-                if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
-                if (!nodeID.ToNode().Info.IsRoad()) continue;
+            foreach (ushort nodeID in GetJunctionRoads(info)) {
                 NetManager.instance.UpdateNode(nodeID);
             }
         }
 
-        public static void UpdateAllNodeRenderers() {
-            try {
-                Log.Called();
-                for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
-                    if (!NetUtil.IsNodeValid(nodeID)) continue;
-                    if (!nodeID.ToNode().Info.IsRoad()) continue;
-                    if (!nodeID.ToNode().m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
-                    NetManager.instance.UpdateNodeRenderer(nodeID, true);
+        public static IEnumerable<ushort> GetJunctionRoads(NetInfo info = null) {
+            for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
+                if (!NetUtil.IsNodeValid(nodeID)) continue;
+                if (!nodeID.ToNode().IsJunction()) continue;
+                if (nodeID.ToNode().Info.IsRoad()) continue;
+                if (info == null || nodeID.ToNode().HasInfo(info)) {
+                    yield return nodeID;
                 }
-            } catch(Exception ex) { ex.Log(); }
+            }
         }
 
-        public static void UpdateAllNodeRenderersFor(NetInfo info) {
-            try {
-                Log.Called();
-                for (ushort nodeID = 0; nodeID < NetManager.MAX_NODE_COUNT; ++nodeID) {
-                    ref NetNode node = ref nodeID.ToNode();
-                    if (!NetUtil.IsNodeValid(nodeID)) continue;
-                    if (node.Info.IsRoad()) continue;
-                    if (node.m_flags.IsFlagSet(NetNode.Flags.Junction)) continue;
-                    if (node.Info != info) continue;
-                    NetManager.instance.UpdateNodeRenderer(nodeID, true);
-                }
-            } catch (Exception ex) { ex.Log(); }
+        public static bool HasRoad(this ref NetNode node) {
+            return node.Info.IsRoad() || node.IterateSegments().Any(segmetnId => segmetnId.ToSegment().Info.IsRoad());
         }
-
+        public static bool HasInfo(this ref NetNode node, NetInfo info) {
+            return node.Info == info || node.IterateSegments().Any(segmetnId => segmetnId.ToSegment().Info == info);
+        }
 
         #region Textures
-        public static NetInfo GetInfo(string name) {
-            var ret = PrefabCollection<NetInfo>.FindLoaded(name);
-            if (ret is null)
-                Log.Warning($"NetInfo '{name}' not found!");
-            return ret;
-        }
-
         public static IEnumerable<NetInfo> IterateRoadPrefabs() {
             int prefabCount = PrefabCollection<NetInfo>.PrefabCount();
             int loadedCount = PrefabCollection<NetInfo>.LoadedCount();
@@ -550,7 +498,7 @@ namespace DirectConnectRoads.Util {
             }
 
             SimulationManager.instance.AddAction(delegate () {
-                NetInfoUtil.UpdateAllNodeRenderersFor(netInfo);
+                NetInfoUtil.FastUpdateAllRoadJunctions(netInfo);
             });
         }
 
@@ -568,7 +516,7 @@ namespace DirectConnectRoads.Util {
             }
 
             SimulationManager.instance.AddAction(delegate () {
-                NetInfoUtil.UpdateAllNodeRenderersFor(netInfo);
+                NetInfoUtil.FastUpdateAllRoadJunctions(netInfo);
             });
         }
     }

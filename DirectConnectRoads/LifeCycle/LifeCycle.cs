@@ -37,7 +37,7 @@ namespace DirectConnectRoads.LifeCycle {
         //}
 
         //public static void OnLevelUnloading() {
-        //    // unloading to main menue or load new level.
+        //    // unloading to main menu or load new level.
         //}
 
         #endregion
@@ -49,7 +49,7 @@ namespace DirectConnectRoads.LifeCycle {
             AfterLoad();
         }
 
-        // first thing that happens when start game/editor from main menue or load another game.
+        // first thing that happens when start game/editor from main menu or load another game.
         public static void PreLoad() {
             try {
                 LogCalled();
@@ -81,7 +81,7 @@ namespace DirectConnectRoads.LifeCycle {
         public static void AfterLoad() {
             LogCalled();
             SimulationManager.instance.AddAction(delegate () {
-                NetInfoUtil.UpdateAllNodeRenderers();
+                NetInfoUtil.FastUpdateAllRoadJunctions();
             });
             UI.DCRTool.Create();
         }

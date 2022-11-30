@@ -47,7 +47,7 @@ namespace DirectConnectRoads.LifeCycle {
                 SimulationManager.instance.ForcedSimulationPaused = false;
             }
 
-            SimulationManager.instance.AddAction(NetInfoUtil.UpdateAllNodeRenderers);
+            SimulationManager.instance.AddAction(() => NetInfoUtil.FastUpdateAllRoadJunctions());
         }
 
         static void RefreshDCFlags() {
@@ -68,11 +68,11 @@ namespace DirectConnectRoads.LifeCycle {
             }
 
             SimulationManager.instance.AddAction(delegate () {
-                NetInfoUtil.UpdateAllNodeRenderers();
+                NetInfoUtil.FastUpdateAllRoadJunctions();
             });
         }
 
-        public static void RefreshNetworks() => SimulationManager.instance.AddAction(NetInfoUtil.FullUpdateAllRoadJunctions);
+        public static void RefreshNetworks() => SimulationManager.instance.AddAction(() => NetInfoUtil.FullUpdateAllRoadJunctions());
 
         public static void OnSettingsUI(UIHelper helper) {
             {
