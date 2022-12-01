@@ -17,7 +17,13 @@ namespace DirectConnectRoads.Util {
         static IManagerFactory TMPE => TrafficManager.API.Implementations.ManagerFactory;
         static ILaneArrowManager LaneArrowManager => TMPE.LaneArrowManager;
 
-        public static void FastUpdateAllRoadJunctions(NetInfo info = null) {
+        public static void FastUpdateAllRoadJunctionsSafe(NetInfo info = null) {
+            Log.Called();
+            SimulationManager.instance.m_ThreadingWrapper.QueueSimulationThread(
+                () => FastUpdateAllRoadJunctions(info));
+        }
+
+        private static void FastUpdateAllRoadJunctions(NetInfo info = null) {
             Log.Called();
             foreach (ushort nodeID in GetJunctionRoads(info)) {
                 nodeID.ToNode().CalculateNode(nodeID);
@@ -26,7 +32,13 @@ namespace DirectConnectRoads.Util {
             }
         }
 
-        public static void FullUpdateAllRoadJunctions(NetInfo info = null) {
+        public static void FullUpdateAllRoadJunctionsSafe(NetInfo info = null) {
+            Log.Called();
+            SimulationManager.instance.m_ThreadingWrapper.QueueSimulationThread(
+                () => FullUpdateAllRoadJunctions(info));
+        }
+
+        private static void FullUpdateAllRoadJunctions(NetInfo info = null) {
             Log.Called();
             foreach (ushort nodeID in GetJunctionRoads(info)) {
                 NetManager.instance.UpdateNode(nodeID);
@@ -497,9 +509,7 @@ namespace DirectConnectRoads.Util {
                 SimulationManager.instance.ForcedSimulationPaused = false;
             }
 
-            SimulationManager.instance.AddAction(delegate () {
-                NetInfoUtil.FastUpdateAllRoadJunctions(netInfo);
-            });
+            FastUpdateAllRoadJunctionsSafe(netInfo);
         }
 
         public static void UnExempt(NetInfo netInfo) {
@@ -515,9 +525,7 @@ namespace DirectConnectRoads.Util {
                 SimulationManager.instance.ForcedSimulationPaused = false;
             }
 
-            SimulationManager.instance.AddAction(delegate () {
-                NetInfoUtil.FastUpdateAllRoadJunctions(netInfo);
-            });
+            FastUpdateAllRoadJunctionsSafe(netInfo);
         }
     }
 }

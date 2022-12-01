@@ -1,4 +1,3 @@
-
 namespace DirectConnectRoads.LifeCycle {
     using ColossalFramework.UI;
     using ICities;
@@ -6,7 +5,7 @@ namespace DirectConnectRoads.LifeCycle {
     using DirectConnectRoads.Util;
     using System;
     using KianCommons;
-    using DirectConnectRoads.UI;
+
     public static class DCRSettings {
         static UICheckBox AddToggle(this UIHelperBase helper, string text, string tooltip, string fieldName, Action OnRefresh) {
             bool defaultValue = (bool)GetFieldValue(DCRConfig.Config, fieldName);
@@ -47,7 +46,7 @@ namespace DirectConnectRoads.LifeCycle {
                 SimulationManager.instance.ForcedSimulationPaused = false;
             }
 
-            SimulationManager.instance.AddAction(() => NetInfoUtil.FastUpdateAllRoadJunctions());
+            NetInfoUtil.FastUpdateAllRoadJunctionsSafe();
         }
 
         static void RefreshDCFlags() {
@@ -67,12 +66,10 @@ namespace DirectConnectRoads.LifeCycle {
                 SimulationManager.instance.ForcedSimulationPaused = false;
             }
 
-            SimulationManager.instance.AddAction(delegate () {
-                NetInfoUtil.FastUpdateAllRoadJunctions();
-            });
+            NetInfoUtil.FastUpdateAllRoadJunctionsSafe();
         }
 
-        public static void RefreshNetworks() => SimulationManager.instance.AddAction(() => NetInfoUtil.FullUpdateAllRoadJunctions());
+        static void FullUpdate() => NetInfoUtil.FullUpdateAllRoadJunctionsSafe();
 
         public static void OnSettingsUI(UIHelper helper) {
             {
@@ -107,7 +104,7 @@ namespace DirectConnectRoads.LifeCycle {
                     tooltip: "this might take a while so only turn this on if you see blue textures.",
                     fieldName: nameof(DCRConfig.RefreshOnStartup),
                     OnRefresh: null);
-                g2.AddButton("Refresh all road junctions (Resolve blue clippings)", "might take a while", RefreshNetworks);
+                g2.AddButton("Refresh all road junctions (Resolve blue clippings)", "might take a while", FullUpdate);
                 g2.AddButton("Regenerate meshes", "might take a while", RefreshDC);
             }
 
