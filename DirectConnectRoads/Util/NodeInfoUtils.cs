@@ -43,7 +43,7 @@ namespace DirectConnectRoads {
                 var material = new Material(segmentInfo.m_material);
                 var mesh = segmentInfo.m_mesh;
                 //Log.Debug("[1] mesh=" + mesh?.name ?? "null", false);
-                mesh = mesh?.CutOutRoadSides(voffset);
+                mesh = mesh?.CutOutRoadSides(voffset, netInfo.m_halfWidth);
                 mesh?.Elevate();
                 if (mesh == null || material == null) {
                     Log.Info("skipping null ...", false);

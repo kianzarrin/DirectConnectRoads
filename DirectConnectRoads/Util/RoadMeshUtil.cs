@@ -112,19 +112,29 @@ namespace DirectConnectRoads.Util {
             return !float.IsNaN(left) && !float.IsNaN(right);
         }
 
+        public static bool IsMedianMesh(this Mesh mesh, float hw) {
+            float left = mesh.vertices.Min(vertex => vertex.x);
+            float right = mesh.vertices.Max(vertex => vertex.x);
+            return right - left < hw;
+        }
+
         /// <summary>
         /// returns a new mesh without the road sides.
         /// </summary>
-        public static Mesh CutOutRoadSides(this Mesh mesh, float voffset/* = ASPHALT_HEIGHT*/) {
-            if (!mesh.GetRoadSides(out float left, out float right, voffset))
+        public static Mesh CutOutRoadSides(this Mesh mesh, float voffset, float hw) {
+            if (mesh.GetRoadSides(out float left, out float right, voffset)) {
+                bool IsGoodFunc(Vector3 vertex) {
+                    float x = vertex.x;
+                    if (EqualApprox(x, left) || EqualApprox(x, right))
+                        return EqualApprox(vertex.y, voffset);
+                    return left < vertex.x && vertex.x < right;
+                }
+                return mesh.CutMeshGeneric2(IsGoodFunc);
+            }else if (mesh.IsMedianMesh(hw)) {
+                return mesh;
+            } else {
                 return null;
-            bool IsGoodFunc(Vector3 vertex) {
-                float x = vertex.x;
-                if (EqualApprox(x, left) || EqualApprox(x, right))
-                    return EqualApprox(vertex.y, voffset);
-                return left < vertex.x && vertex.x < right;
             }
-            return mesh.CutMeshGeneric2(IsGoodFunc);
         }
 
         /// <summary>
