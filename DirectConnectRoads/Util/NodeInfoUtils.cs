@@ -30,7 +30,7 @@ namespace DirectConnectRoads {
         }
 
         public static IEnumerable<NetInfo.Node> CreateDCNodes(NetInfo.Node template, NetInfo netInfo, float voffset/* = NetInfoUtil.ASPHALT_HEIGHT*/) {
-            Assertion.AssertNotNull(netInfo, "netInfo");
+            Assertion.AssertNotNull(netInfo, m: "netInfo");
             Log.Info($"CreateDCNode({netInfo},{voffset}) called", false);
             var ret = new List<NetInfo.Node>();
             for (int i = 0; i < netInfo.m_segments.Length; ++i) {
@@ -43,7 +43,12 @@ namespace DirectConnectRoads {
                 var material = new Material(segmentInfo.m_material);
                 var mesh = segmentInfo.m_mesh;
                 //Log.Debug("[1] mesh=" + mesh?.name ?? "null", false);
-                mesh = mesh?.CutOutRoadSides(voffset, netInfo.m_halfWidth);
+                if(mesh.name == "medium_grass_strip") {
+                    // known median
+                    mesh = Mesh.Instantiate(mesh);
+                } else { 
+                    mesh = mesh?.CutOutRoadSides(voffset, netInfo.m_halfWidth);
+                }
                 mesh?.Elevate();
                 if (mesh == null || material == null) {
                     Log.Info("skipping null ...", false);

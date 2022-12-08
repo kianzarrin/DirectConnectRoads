@@ -112,12 +112,6 @@ namespace DirectConnectRoads.Util {
             return !float.IsNaN(left) && !float.IsNaN(right);
         }
 
-        public static bool IsMedianMesh(this Mesh mesh, float hw) {
-            float left = mesh.vertices.Min(vertex => vertex.x);
-            float right = mesh.vertices.Max(vertex => vertex.x);
-            return right - left < hw;
-        }
-
         /// <summary>
         /// returns a new mesh without the road sides.
         /// </summary>
@@ -130,8 +124,6 @@ namespace DirectConnectRoads.Util {
                     return left < vertex.x && vertex.x < right;
                 }
                 return mesh.CutMeshGeneric2(IsGoodFunc);
-            }else if (mesh.IsMedianMesh(hw)) {
-                return mesh;
             } else {
                 return null;
             }
@@ -142,7 +134,7 @@ namespace DirectConnectRoads.Util {
         /// </summary>
         /// <param name="mesh"></param>
         /// <param name="delta"></param>
-        public static void Elevate(this Mesh mesh, float delta = 1e-2f) {
+        public static void Elevate(this Mesh mesh, float delta = 0.002f) {
             var vertices = mesh.vertices;
             for (int i = 0; i < mesh.vertexCount; ++i)
                 vertices[i].y += delta;
